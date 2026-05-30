@@ -65,6 +65,20 @@ body {
   outline: none;
 }
 
+.custom-amount-input {
+  background: transparent;
+  border: 0;
+  color: #ede8df;
+  flex: 1;
+  min-width: 0;
+  padding: 0.8rem 0.25rem;
+  width: 100%;
+}
+
+.custom-amount-input:focus {
+  outline: none;
+}
+
 button,
 input,
 select,

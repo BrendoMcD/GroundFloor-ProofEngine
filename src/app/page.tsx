@@ -208,12 +208,13 @@ export default function Home() {
 
   function addSupport(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const pledgeAmount = Math.max(1, Number.isFinite(supportAmount) ? supportAmount : 1);
     const support: Support = {
       id: makeId("support"),
       artistId: activeArtist.id,
       supporterName: supporterName.trim() || "Early Believer",
       supporterEmail: supporterEmail.trim(),
-      amount: supportAmount,
+      amount: pledgeAmount,
       reason: supportReason,
       referralCode: getReferralCode(supporterName || "fan"),
       createdAt: Date.now(),
@@ -403,15 +404,22 @@ export default function Home() {
                       </button>
                     ))}
                   </div>
-                  <label className="field-label">
-                    Custom amount
-                    <input
-                      className="field-input"
-                      min="1"
-                      type="number"
-                      value={supportAmount}
-                      onChange={(event) => setSupportAmount(Number(event.target.value))}
-                    />
+                  <label className="field-label rounded-xl border border-[#c9a84c]/25 bg-[#0f0f0f] p-3">
+                    <span>Support a custom amount</span>
+                    <span className="flex items-center rounded-xl border border-white/10 bg-[#101010] px-3 focus-within:border-[#c9a84c]/80 focus-within:shadow-[0_0_0_3px_rgba(201,168,76,0.14)]">
+                      <span className="text-lg font-black text-[#c9a84c]">$</span>
+                      <input
+                        className="custom-amount-input"
+                        inputMode="numeric"
+                        min="1"
+                        placeholder="Enter amount"
+                        required
+                        step="1"
+                        type="number"
+                        value={supportAmount}
+                        onChange={(event) => setSupportAmount(Number(event.target.value))}
+                      />
+                    </span>
                   </label>
                   <label className="field-label">
                     Name
