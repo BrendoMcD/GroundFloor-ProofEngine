@@ -325,11 +325,92 @@
     margin-bottom: 0;
   }
   @media (max-width: 768px) {
-    nav, header, .search-container, .discovery-actions, .section-header { padding-left: 1.5rem; padding-right: 1.5rem; }
-    .row-container { padding: 0 1.5rem 2rem 1.5rem; }
-    .row-container .card { flex: 0 0 280px; }
+    body {
+      padding-top: 1rem;
+      padding-bottom: 3rem;
+    }
+    nav {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-bottom: 2.5rem;
+    }
+    .nav-logo {
+      font-size: 1.45rem;
+      line-height: 1;
+    }
+    .nav-links {
+      display: grid;
+      gap: 0.45rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      width: 100%;
+    }
+    .nav-links a {
+      align-items: center;
+      border: 1px solid rgba(237,232,223,0.14);
+      border-radius: 999px;
+      display: flex;
+      font-size: 0.76rem;
+      justify-content: center;
+      min-height: 2.35rem;
+      padding: 0.55rem 0.6rem;
+      text-align: center;
+    }
+    header {
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+    h1 {
+      font-size: clamp(2.4rem, 15vw, 3.5rem);
+      line-height: 0.95;
+    }
+    p.subtitle {
+      font-size: 0.98rem;
+      line-height: 1.45;
+    }
+    nav, header, .search-container, .discovery-actions, .section-header { padding-left: 1.25rem; padding-right: 1.25rem; }
+    .search-container {
+      margin-bottom: 0.85rem;
+    }
+    .search-input {
+      border-radius: 16px;
+      font-size: 0.92rem;
+      line-height: 1.35;
+      padding-right: 1rem;
+    }
+    .discovery-actions {
+      margin-bottom: 2.5rem;
+      padding-top: 0;
+    }
+    .row-container { padding: 0 1.25rem 2rem 1.25rem; }
+    .row-container .card { flex: 0 0 min(282px, calc(100vw - 2.5rem)); }
+    .art {
+      height: 170px;
+    }
+    .info {
+      padding: 1.15rem;
+    }
+    .title {
+      font-size: 1.22rem;
+      line-height: 1.2;
+    }
+    .artist {
+      margin-bottom: 1rem;
+    }
+    .dsp-links {
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+    .dsp-btn {
+      justify-content: center;
+      width: 100%;
+    }
     .discovery-action-primary,
     .discovery-action-secondary { width: 100%; text-align: center; }
+    .discovery-action-note {
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
   }
 
   /* Hide Button Default, Show on Hover */
@@ -380,8 +461,15 @@
     padding-right: 0;
   }
   @media (max-width: 768px) {
-    .row-container .card:first-child { margin-left: 1.5rem; }
-    .row-container .card:last-child { margin-right: 1.5rem; }
+    .row-container .card:first-child { margin-left: 1.25rem; }
+    .row-container .card:last-child { margin-right: 1.25rem; }
+  }
+
+  @media (max-width: 390px) {
+    nav, header, .search-container, .discovery-actions, .section-header { padding-left: 1rem; padding-right: 1rem; }
+    .row-container .card { flex-basis: min(270px, calc(100vw - 2rem)); }
+    .row-container .card:first-child { margin-left: 1rem; }
+    .row-container .card:last-child { margin-right: 1rem; }
   }
 </style>
 </head>

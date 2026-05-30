@@ -16,6 +16,7 @@
       --dark3: #1C1A14;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { overflow-x: hidden; }
     
     body {
       background: url('/prototype/auth-bg.png') center/cover no-repeat fixed;
@@ -23,6 +24,7 @@
       font-family: 'DM Sans', sans-serif;
       min-height: 100vh;
       display: flex;
+      overflow-x: hidden;
     }
 
     .auth-container {
@@ -156,7 +158,46 @@
 
     @media (max-width: 900px) {
       .auth-hero { display: none; }
-      .auth-form-container { width: 100%; border-left: none; padding: 2rem; }
+      body {
+        background-attachment: scroll;
+      }
+      .auth-container {
+        min-height: 100dvh;
+      }
+      .auth-form-container {
+        width: 100%;
+        border-left: none;
+        justify-content: flex-start;
+        min-height: 100dvh;
+        padding: 1.5rem;
+      }
+      .back-link {
+        margin-bottom: 1.5rem;
+      }
+      .form-header {
+        margin-bottom: 1.5rem;
+      }
+      h2 {
+        font-size: clamp(2rem, 12vw, 2.6rem);
+        line-height: 1;
+      }
+      .social-btn,
+      input,
+      .submit-btn {
+        min-height: 3.1rem;
+      }
+      .divider {
+        margin: 1.4rem 0;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .auth-form-container {
+        padding: 1.15rem;
+      }
+      .social-btn {
+        font-size: 0.92rem;
+      }
     }
   </style>
 </head>
