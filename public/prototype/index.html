@@ -356,23 +356,31 @@
       max-width: 100%;
     }
     .nav-links {
-      display: grid !important;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 0.45rem !important;
+      display: flex !important;
+      gap: 0.35rem !important;
+      overflow-x: auto;
+      padding-bottom: 0.15rem;
+      scrollbar-width: none;
       width: 100%;
+    }
+    .nav-links::-webkit-scrollbar {
+      display: none;
     }
     .nav-links a,
     .nav-cta {
       align-items: center;
       border: 1px solid rgba(237,232,223,0.16);
+      border-radius: 999px;
       display: flex;
-      font-size: 0.68rem !important;
+      flex: 0 0 auto;
+      font-size: 0.64rem !important;
       justify-content: center;
       letter-spacing: 0.08em;
       line-height: 1.1;
-      min-height: 2.35rem;
-      padding: 0.55rem 0.45rem !important;
+      min-height: 2.15rem;
+      padding: 0.5rem 0.58rem !important;
       text-align: center;
+      white-space: nowrap;
     }
     .nav-cta {
       margin-left: 0 !important;
@@ -443,10 +451,10 @@
     }
     .nav-links a,
     .nav-cta {
-      font-size: 0.62rem !important;
-      min-height: 2.2rem;
-      padding-left: 0.25rem !important;
-      padding-right: 0.25rem !important;
+      font-size: 0.6rem !important;
+      min-height: 2.05rem;
+      padding-left: 0.48rem !important;
+      padding-right: 0.48rem !important;
     }
     .hero {
       min-height: 840px;

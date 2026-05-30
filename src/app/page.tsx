@@ -498,7 +498,7 @@ export function GroundFloorApp({
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-[#ede8df]">
       <header className="fixed left-0 top-0 z-30 w-full border-b border-white/10 bg-[#0a0a0a]/85 px-4 py-3 backdrop-blur-md sm:px-6">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
+        <div className="mx-auto flex max-w-6xl flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
           <button
             className="font-display text-3xl uppercase tracking-[0.04em] text-[#c9a84c]"
             onClick={() => {
@@ -507,7 +507,7 @@ export function GroundFloorApp({
           >
             GroundFloor
           </button>
-          <nav className="flex flex-wrap justify-end gap-1 rounded-2xl border border-white/10 bg-white/[0.04] p-1 text-xs font-bold sm:rounded-full sm:text-sm">
+          <nav className="flex w-full flex-nowrap gap-1 overflow-x-auto rounded-full border border-white/10 bg-white/[0.04] p-1 text-xs font-bold [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:w-auto sm:justify-end sm:text-sm">
             {siteNav.map((item) => {
               const isActive =
                 "view" in item
@@ -517,7 +517,7 @@ export function GroundFloorApp({
               return (
               <button
                 key={item.label}
-                className={`rounded-full px-3 py-2 transition sm:px-4 ${
+                className={`shrink-0 rounded-full px-3 py-2 transition sm:px-4 ${
                   isActive ? "bg-[#c9a84c] text-[#0a0a0a]" : "text-[#ede8df]/70"
                 }`}
                 onClick={() => {
@@ -539,7 +539,7 @@ export function GroundFloorApp({
 
       {view === "campaign" && (
         <>
-          <section className="relative overflow-hidden pt-16">
+          <section className="relative overflow-hidden pt-28 sm:pt-16">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(201,168,76,0.28),transparent_28%),linear-gradient(120deg,rgba(31,31,31,0.95),rgba(10,10,10,0.88)),url('https://images.unsplash.com/photo-1598387181032-a3103a2db5b3?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center" />
             <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0a0a0a] to-transparent" />
             <div className="relative mx-auto grid max-w-6xl gap-8 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[minmax(0,1fr)_360px] lg:py-24">

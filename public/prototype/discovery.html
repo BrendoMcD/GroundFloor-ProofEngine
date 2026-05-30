@@ -340,21 +340,28 @@
       line-height: 1;
     }
     .nav-links {
-      display: grid;
-      gap: 0.45rem;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      display: flex;
+      gap: 0.35rem;
+      overflow-x: auto;
+      padding-bottom: 0.15rem;
+      scrollbar-width: none;
       width: 100%;
+    }
+    .nav-links::-webkit-scrollbar {
+      display: none;
     }
     .nav-links a {
       align-items: center;
       border: 1px solid rgba(237,232,223,0.14);
       border-radius: 999px;
       display: flex;
-      font-size: 0.76rem;
+      flex: 0 0 auto;
+      font-size: 0.64rem;
       justify-content: center;
-      min-height: 2.35rem;
-      padding: 0.55rem 0.6rem;
+      min-height: 2.15rem;
+      padding: 0.5rem 0.58rem;
       text-align: center;
+      white-space: nowrap;
     }
     header {
       margin-bottom: 2rem;
