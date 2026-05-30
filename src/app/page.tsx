@@ -288,6 +288,7 @@ export function GroundFloorApp({
   const [supportReason, setSupportReason] = useState(supportReasons[1]);
   const [latestBadgeId, setLatestBadgeId] = useState<string | null>(null);
   const [createMode, setCreateMode] = useState<"artist" | "fan">("artist");
+  const [artistPageTab, setArtistPageTab] = useState<"overview" | "community">("overview");
 
   useEffect(() => {
     const saved = window.localStorage.getItem(STORAGE_KEY);
@@ -370,6 +371,7 @@ export function GroundFloorApp({
   function showArtist(artist: Artist, pushRoute = true) {
     setActiveArtistId(artist.id);
     setLatestBadgeId(null);
+    setArtistPageTab("overview");
     setView("campaign");
 
     if (pushRoute) {
@@ -466,6 +468,32 @@ export function GroundFloorApp({
     reason,
     count: artistSupports.filter((support) => support.reason === reason).length,
   }));
+  const recentCommunity = [
+    ...artistSupports.map((support) => ({
+      id: support.id,
+      label: support.supporterName,
+      detail: support.reason,
+      meta: `${money(support.amount)} pledge`,
+      createdAt: support.createdAt,
+      type: "Support",
+    })),
+    ...artistShares.map((share) => ({
+      id: share.id,
+      label: share.referralCode,
+      detail: "Shared the campaign link",
+      meta: "Referral signal",
+      createdAt: share.createdAt,
+      type: "Share",
+    })),
+    ...artistListens.map((listen) => ({
+      id: listen.id,
+      label: activeArtist.songTitle,
+      detail: "Tapped Listen from the artist page",
+      meta: "Listen signal",
+      createdAt: listen.createdAt,
+      type: "Listen",
+    })),
+  ].sort((a, b) => b.createdAt - a.createdAt);
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-[#ede8df]">
@@ -587,8 +615,29 @@ export function GroundFloorApp({
             </div>
           </section>
 
+          <section className="mx-auto max-w-6xl px-4 pb-6 sm:px-6">
+            <div className="flex w-full rounded-2xl border border-white/10 bg-[#141414] p-1 text-sm font-black sm:w-fit sm:rounded-full">
+              {[
+                ["overview", "Overview"],
+                ["community", "Community"],
+              ].map(([tab, label]) => (
+                <button
+                  key={tab}
+                  className={`flex-1 rounded-xl px-4 py-3 transition sm:flex-none sm:rounded-full sm:px-5 ${
+                    artistPageTab === tab ? "bg-[#c9a84c] text-[#0a0a0a]" : "text-[#ede8df]/60"
+                  }`}
+                  onClick={() => setArtistPageTab(tab as "overview" | "community")}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </section>
+
           <section className="mx-auto grid max-w-6xl gap-6 px-4 pb-28 sm:px-6 lg:grid-cols-[minmax(0,1fr)_360px]">
             <div className="grid gap-6">
+              {artistPageTab === "overview" ? (
+                <>
               <article className="rounded-2xl border border-white/10 bg-[#141414] p-5 sm:p-7">
                 <p className="section-kicker">Featured Song</p>
                 <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -690,6 +739,107 @@ export function GroundFloorApp({
                   )}
                 </div>
               </article>
+                </>
+              ) : (
+                <>
+                  <article className="rounded-2xl border border-white/10 bg-[#141414] p-5 sm:p-7">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <p className="section-kicker">Community</p>
+                        <h2 className="font-display mt-2 text-4xl uppercase text-white">People pushing the signal</h2>
+                      </div>
+                      <button
+                        className="rounded-full border border-[#c9a84c]/45 px-4 py-2 text-sm font-black text-[#c9a84c] transition hover:border-[#c9a84c] hover:bg-[#c9a84c]/10"
+                        onClick={() => trackShare(latestSupport?.referralCode ?? "community")}
+                      >
+                        Track share
+                      </button>
+                    </div>
+                    <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                      <div className="rounded-xl border border-white/10 bg-[#1f1f1f] p-4">
+                        <b className="font-display block text-4xl text-[#c9a84c]">{artistSupports.length}</b>
+                        <span className="text-sm text-[#ede8df]/55">early believers</span>
+                      </div>
+                      <div className="rounded-xl border border-white/10 bg-[#1f1f1f] p-4">
+                        <b className="font-display block text-4xl text-[#c9a84c]">{artistShares.length}</b>
+                        <span className="text-sm text-[#ede8df]/55">shares tracked</span>
+                      </div>
+                      <div className="rounded-xl border border-white/10 bg-[#1f1f1f] p-4">
+                        <b className="font-display block text-4xl text-[#c9a84c]">{artistListens.length}</b>
+                        <span className="text-sm text-[#ede8df]/55">listen taps</span>
+                      </div>
+                    </div>
+                  </article>
+
+                  <article className="rounded-2xl border border-white/10 bg-[#141414] p-5 sm:p-7">
+                    <p className="section-kicker">Why fans support</p>
+                    <div className="mt-4 grid gap-3">
+                      {reasonCounts
+                        .filter((item) => item.count > 0)
+                        .map((item) => (
+                          <div key={item.reason} className="rounded-xl border border-white/10 bg-[#1f1f1f] p-4">
+                            <div className="flex items-center justify-between gap-4">
+                              <p className="font-black text-white">{item.reason}</p>
+                              <p className="font-display text-3xl text-[#c9a84c]">{item.count}</p>
+                            </div>
+                            <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
+                              <div
+                                className="h-full rounded-full bg-[#c9a84c]"
+                                style={{ width: `${artistSupports.length ? (item.count / artistSupports.length) * 100 : 0}%` }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      {!artistSupports.length && (
+                        <p className="rounded-xl border border-white/10 bg-[#1f1f1f] p-4 text-sm text-[#ede8df]/55">
+                          Support reasons appear here after fans pledge.
+                        </p>
+                      )}
+                    </div>
+                  </article>
+
+                  <article className="rounded-2xl border border-white/10 bg-[#141414] p-5 sm:p-7">
+                    <p className="section-kicker">Community feed</p>
+                    <div className="mt-4 grid gap-3">
+                      {recentCommunity.length ? (
+                        recentCommunity.slice(0, 6).map((event) => (
+                          <div
+                            key={`${event.type}-${event.id}`}
+                            className="grid gap-3 rounded-xl border border-white/10 bg-[#1f1f1f] p-4 sm:grid-cols-[96px_minmax(0,1fr)_auto] sm:items-center"
+                          >
+                            <span className="w-fit rounded-full bg-[#c9a84c]/15 px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-[#c9a84c]">
+                              {event.type}
+                            </span>
+                            <div>
+                              <p className="font-black text-white">{event.label}</p>
+                              <p className="text-sm text-[#ede8df]/52">{event.detail}</p>
+                            </div>
+                            <p className="text-sm font-black text-[#ede8df]/65">{event.meta}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="rounded-xl border border-white/10 bg-[#1f1f1f] p-4 text-sm text-[#ede8df]/55">
+                          Community activity will show pledges, listens, and shares as they happen.
+                        </p>
+                      )}
+                    </div>
+                  </article>
+
+                  <article className="rounded-2xl border border-white/10 bg-[#141414] p-5 sm:p-7">
+                    <p className="section-kicker">Street team</p>
+                    <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                      {["Listen and save the song", "Share with three friends", "Bring one new supporter"].map((action) => (
+                        <div key={action} className="rounded-xl border border-white/10 bg-[#1f1f1f] p-4">
+                          <p className="font-black text-white">{action}</p>
+                          <p className="mt-2 text-sm leading-6 text-[#ede8df]/52">
+                            Lightweight actions fans can take before the artist has a full campaign team.
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </article>
+                </>
+              )}
             </div>
 
             <aside className="lg:sticky lg:top-24 lg:self-start">
