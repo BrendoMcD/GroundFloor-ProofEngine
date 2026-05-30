@@ -2,6 +2,18 @@
 
 GroundFloor is a mobile-first MVP for testing whether early fans will support emerging artists, earn visible status, and help create proof of demand.
 
+Live app:
+
+```text
+https://groundfloor-app.vercel.app/
+```
+
+GitHub:
+
+```text
+https://github.com/mcdeeai/GroundFloor-App
+```
+
 This app is not just a pitch page. It is a proof engine for the riskiest investor questions:
 
 - Will artists or fans create pages?
