@@ -134,6 +134,7 @@ export default function Home() {
   const [supporterEmail, setSupporterEmail] = useState("");
   const [supportReason, setSupportReason] = useState(supportReasons[1]);
   const [latestBadgeId, setLatestBadgeId] = useState<string | null>(null);
+  const [createMode, setCreateMode] = useState<"artist" | "fan">("artist");
 
   useEffect(() => {
     const saved = window.localStorage.getItem(STORAGE_KEY);
@@ -184,18 +185,27 @@ export default function Home() {
   function addArtist(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    const mode = data.get("mode") === "fan" ? "fan" : "artist";
+    const artistName = String(data.get("name") || "Untitled Artist");
     const artist: Artist = {
       id: makeId("artist"),
-      name: String(data.get("name") || "Untitled Artist"),
+      name: artistName,
       genre: String(data.get("genre") || "Emerging"),
-      headline: String(data.get("headline") || "Help this artist find their first real audience."),
-      story: String(data.get("story") || "This campaign needs a sharper story."),
+      headline:
+        mode === "fan"
+          ? `Fans are nominating ${artistName} for a GroundFloor campaign.`
+          : String(data.get("headline") || "Help this artist find their first real audience."),
+      story:
+        String(data.get("story")) ||
+        (mode === "fan"
+          ? "A fan thinks this artist has early energy worth testing with the GroundFloor community."
+          : "This campaign needs a sharper story."),
       songTitle: String(data.get("songTitle") || "First single"),
       songUrl: String(data.get("songUrl") || ""),
-      goal: Number(data.get("goal") || 250),
+      goal: mode === "fan" ? 250 : Number(data.get("goal") || 250),
       creatorName: String(data.get("creatorName") || "Anonymous fan"),
       creatorEmail: String(data.get("creatorEmail") || ""),
-      mode: data.get("mode") === "fan" ? "fan" : "artist",
+      mode,
       createdAt: Date.now(),
     };
 
@@ -203,6 +213,7 @@ export default function Home() {
     setActiveArtistId(artist.id);
     setLatestBadgeId(null);
     setView("campaign");
+    setCreateMode("artist");
     event.currentTarget.reset();
   }
 
@@ -294,9 +305,16 @@ export default function Home() {
                     </button>
                   ))}
                 </div>
-                <p className="mb-4 inline-flex rounded-full border border-[#c9a84c]/30 bg-[#c9a84c]/15 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-[#c9a84c]">
-                  {activeArtist.genre}
-                </p>
+                <div className="mb-4 flex flex-wrap gap-2">
+                  <p className="inline-flex rounded-full border border-[#c9a84c]/30 bg-[#c9a84c]/15 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-[#c9a84c]">
+                    {activeArtist.genre}
+                  </p>
+                  {activeArtist.mode === "fan" && (
+                    <p className="inline-flex rounded-full border border-white/15 bg-black/35 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-[#ede8df]/70">
+                      Fan nominated
+                    </p>
+                  )}
+                </div>
                 <h1 className="font-display max-w-3xl text-6xl uppercase leading-[0.88] tracking-[0.02em] text-white sm:text-8xl">
                   {activeArtist.name}
                 </h1>
@@ -307,17 +325,23 @@ export default function Home() {
 
               <aside className="rounded-2xl border border-white/10 bg-[#141414]/90 p-5 shadow-2xl shadow-black/35 backdrop-blur">
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-[#c9a84c]">
-                  Campaign proof
+                  {activeArtist.mode === "fan" ? "Nomination proof" : "Campaign proof"}
                 </p>
                 <div className="mt-3 flex items-end justify-between gap-4">
                   <p className="font-display text-5xl text-[#c9a84c]">{money(raised)}</p>
                   <p className="pb-2 text-right text-sm font-bold text-[#ede8df]/55">
-                    of {money(activeArtist.goal)}
+                    {activeArtist.mode === "fan" ? "artist claim pending" : `of ${money(activeArtist.goal)}`}
                   </p>
                 </div>
-                <div className="mt-4 h-3 overflow-hidden rounded-full bg-white/10">
-                  <div className="h-full rounded-full bg-[#c9a84c]" style={{ width: `${progress}%` }} />
-                </div>
+                {activeArtist.mode === "artist" ? (
+                  <div className="mt-4 h-3 overflow-hidden rounded-full bg-white/10">
+                    <div className="h-full rounded-full bg-[#c9a84c]" style={{ width: `${progress}%` }} />
+                  </div>
+                ) : (
+                  <p className="mt-4 rounded-xl border border-white/10 bg-white/[0.04] p-3 text-sm font-bold text-[#ede8df]/60">
+                    Fans can register early support, but the artist sets campaign terms after claiming the page.
+                  </p>
+                )}
                 <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
                   <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3">
                     <b className="block text-xl text-white">{artistSupports.length}</b>
@@ -499,16 +523,18 @@ export default function Home() {
               Genre / scene
               <input name="genre" className="field-input" placeholder="Indie pop, college rap..." />
             </label>
+            {createMode === "artist" && (
+              <label className="field-label sm:col-span-2">
+                Campaign headline
+                <input
+                  name="headline"
+                  className="field-input"
+                  placeholder="Help this single find its first real audience."
+                />
+              </label>
+            )}
             <label className="field-label sm:col-span-2">
-              Campaign headline
-              <input
-                name="headline"
-                className="field-input"
-                placeholder="Help this single find its first real audience."
-              />
-            </label>
-            <label className="field-label sm:col-span-2">
-              Why now?
+              {createMode === "fan" ? "Why should they be on GroundFloor?" : "Why now?"}
               <textarea name="story" className="field-input min-h-28" />
             </label>
             <label className="field-label">
@@ -519,16 +545,28 @@ export default function Home() {
               Song link
               <input name="songUrl" className="field-input" placeholder="Spotify, SoundCloud, YouTube" />
             </label>
+            {createMode === "artist" && (
+              <label className="field-label">
+                Campaign goal
+                <input name="goal" type="number" min="25" defaultValue="250" className="field-input" />
+              </label>
+            )}
             <label className="field-label">
-              Campaign goal
-              <input name="goal" type="number" min="25" defaultValue="250" className="field-input" />
-            </label>
-            <label className="field-label">
-              Created by
-              <select name="mode" className="field-input bg-[#101010]">
+              Page type
+              <select
+                name="mode"
+                className="field-input bg-[#101010]"
+                value={createMode}
+                onChange={(event) => setCreateMode(event.target.value === "fan" ? "fan" : "artist")}
+              >
                 <option value="artist">Artist</option>
                 <option value="fan">Fan nomination</option>
               </select>
+              <span className="text-xs font-bold leading-5 text-[#ede8df]/45">
+                {createMode === "fan"
+                  ? "Fans nominate artists. The artist claims the page before campaign terms are set."
+                  : "Artists can set the campaign headline and goal."}
+              </span>
             </label>
             <label className="field-label">
               Your name
@@ -539,7 +577,7 @@ export default function Home() {
               <input name="creatorEmail" type="email" className="field-input" />
             </label>
             <button className="rounded-xl bg-[#c9a84c] px-5 py-4 font-black text-[#0a0a0a] sm:col-span-2">
-              Publish test page
+              {createMode === "fan" ? "Nominate artist" : "Publish test page"}
             </button>
           </form>
         </section>
