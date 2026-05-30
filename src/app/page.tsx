@@ -35,10 +35,26 @@ type ShareEvent = {
   createdAt: number;
 };
 
+type ListenEvent = {
+  id: string;
+  artistId: string;
+  createdAt: number;
+};
+
 type EngineState = {
   artists: Artist[];
   supports: Support[];
   shares: ShareEvent[];
+  listens: ListenEvent[];
+};
+
+type GrowthMetric = "supports" | "clicks" | "listens";
+
+type GrowthPoint = {
+  label: string;
+  supports: number;
+  clicks: number;
+  listens: number;
 };
 
 const STORAGE_KEY = "groundfloor-proof-engine-v1";
@@ -91,6 +107,13 @@ const seedState: EngineState = {
       createdAt: Date.now() - 5400000,
     },
   ],
+  listens: [
+    {
+      id: "listen-1",
+      artistId: seedArtist.id,
+      createdAt: Date.now() - 5000000,
+    },
+  ],
 };
 
 const supportReasons = [
@@ -125,6 +148,36 @@ function getReferralCode(name: string) {
   return `${base || "fan"}-${Math.random().toString(36).slice(2, 6)}`;
 }
 
+function buildGrowthPoints(state: EngineState) {
+  const day = 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  const start = now - day * 6;
+
+  return Array.from({ length: 7 }, (_, index) => {
+    const dayStart = start + day * index;
+    const dayEnd = dayStart + day;
+
+    return {
+      label: new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(dayStart),
+      supports: state.supports.filter((support) => support.createdAt <= dayEnd).length,
+      clicks: state.shares.filter((share) => share.createdAt <= dayEnd).length,
+      listens: state.listens.filter((listen) => listen.createdAt <= dayEnd).length,
+    };
+  });
+}
+
+function buildLinePath(points: GrowthPoint[], metric: GrowthMetric, maxValue: number, width: number, height: number) {
+  const xStep = width / Math.max(1, points.length - 1);
+
+  return points
+    .map((point, index) => {
+      const x = index * xStep;
+      const y = height - (point[metric] / maxValue) * height;
+      return `${index === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`;
+    })
+    .join(" ");
+}
+
 export default function Home() {
   const [state, setState] = useState<EngineState>(seedState);
   const [activeArtistId, setActiveArtistId] = useState(seedArtist.id);
@@ -144,7 +197,12 @@ export default function Home() {
       const parsed = JSON.parse(saved) as EngineState;
       if (parsed.artists?.length) {
         queueMicrotask(() => {
-          setState(parsed);
+          setState({
+            artists: parsed.artists,
+            supports: parsed.supports ?? [],
+            shares: parsed.shares ?? [],
+            listens: parsed.listens ?? [],
+          });
           setActiveArtistId(parsed.artists[0].id);
         });
       }
@@ -172,8 +230,18 @@ export default function Home() {
     [activeArtist.id, state.shares],
   );
 
+  const artistListens = useMemo(
+    () => state.listens.filter((listen) => listen.artistId === activeArtist.id),
+    [activeArtist.id, state.listens],
+  );
+
   const raised = artistSupports.reduce((sum, support) => sum + support.amount, 0);
   const progress = Math.min(100, Math.round((raised / activeArtist.goal) * 100));
+  const growthPoints = useMemo(() => buildGrowthPoints(state), [state]);
+  const maxGrowthValue = Math.max(
+    1,
+    ...growthPoints.flatMap((point) => [point.supports, point.clicks, point.listens]),
+  );
   const latestSupport = latestBadgeId
     ? state.supports.find((support) => support.id === latestBadgeId)
     : null;
@@ -247,6 +315,15 @@ export default function Home() {
       createdAt: Date.now(),
     };
     setState((current) => ({ ...current, shares: [share, ...current.shares] }));
+  }
+
+  function trackListen() {
+    const listen = {
+      id: makeId("listen"),
+      artistId: activeArtist.id,
+      createdAt: Date.now(),
+    };
+    setState((current) => ({ ...current, listens: [listen, ...current.listens] }));
   }
 
   const reasonCounts = supportReasons.map((reason) => ({
@@ -342,7 +419,7 @@ export default function Home() {
                     Fans can register early support, but the artist sets campaign terms after claiming the page.
                   </p>
                 )}
-                <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
+                <div className="mt-5 grid grid-cols-3 gap-3 text-sm">
                   <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3">
                     <b className="block text-xl text-white">{artistSupports.length}</b>
                     <span className="text-[#ede8df]/55">supporters</span>
@@ -350,6 +427,10 @@ export default function Home() {
                   <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3">
                     <b className="block text-xl text-white">{artistShares.length}</b>
                     <span className="text-[#ede8df]/55">shares tracked</span>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3">
+                    <b className="block text-xl text-white">{artistListens.length}</b>
+                    <span className="text-[#ede8df]/55">listens</span>
                   </div>
                 </div>
               </aside>
@@ -371,6 +452,7 @@ export default function Home() {
                     <a
                       className="inline-flex w-full items-center justify-center rounded-full border border-[#c9a84c]/40 px-5 py-3 text-sm font-black text-[#c9a84c] sm:w-auto"
                       href={activeArtist.songUrl}
+                      onClick={trackListen}
                     >
                       Listen
                     </a>
@@ -385,7 +467,7 @@ export default function Home() {
 
               <article className="rounded-2xl border border-white/10 bg-[#141414] p-5 sm:p-7">
                 <p className="section-kicker">Public Proof</p>
-                <div className="mt-4 grid grid-cols-3 gap-2 text-center text-sm sm:gap-3">
+                <div className="mt-4 grid grid-cols-2 gap-2 text-center text-sm sm:grid-cols-4 sm:gap-3">
                   <div className="rounded-xl bg-[#1f1f1f] p-3">
                     <b className="block text-lg text-white">{money(Math.round(raised * 0.82))}</b>
                     <span className="text-[#ede8df]/50">ad budget</span>
@@ -399,6 +481,10 @@ export default function Home() {
                   <div className="rounded-xl bg-[#1f1f1f] p-3">
                     <b className="block text-lg text-white">{Math.max(0, artistSupports.length * 6)}</b>
                     <span className="text-[#ede8df]/50">click intent</span>
+                  </div>
+                  <div className="rounded-xl bg-[#1f1f1f] p-3">
+                    <b className="block text-lg text-white">{artistListens.length}</b>
+                    <span className="text-[#ede8df]/50">listen taps</span>
                   </div>
                 </div>
               </article>
@@ -590,18 +676,102 @@ export default function Home() {
             Investor questions, answered with behavior.
           </h1>
 
-          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {[
               ["Artist pages", state.artists.length],
               ["Pledges", state.supports.length],
               ["Raised intent", money(state.supports.reduce((sum, support) => sum + support.amount, 0))],
               ["Tracked shares", state.shares.length],
+              ["Listen taps", state.listens.length],
             ].map(([label, value]) => (
               <div key={label} className="rounded-2xl border border-white/10 bg-[#141414] p-4">
                 <p className="text-sm font-bold text-[#ede8df]/45">{label}</p>
                 <p className="font-display mt-2 text-4xl text-[#c9a84c]">{value}</p>
               </div>
             ))}
+          </div>
+
+          <div className="mt-5 rounded-2xl border border-white/10 bg-[#141414] p-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="section-kicker">Live growth</p>
+                <h2 className="font-display mt-2 text-4xl uppercase text-white">Signals over time</h2>
+              </div>
+              <div className="flex flex-wrap gap-2 text-xs font-black uppercase tracking-[0.12em]">
+                <span className="rounded-full bg-[#c9a84c]/15 px-3 py-1 text-[#c9a84c]">Pledges</span>
+                <span className="rounded-full bg-[#6fb6ff]/15 px-3 py-1 text-[#6fb6ff]">Clicks</span>
+                <span className="rounded-full bg-[#ff7ac8]/15 px-3 py-1 text-[#ff7ac8]">Listens</span>
+              </div>
+            </div>
+            <div className="mt-5 overflow-hidden rounded-xl border border-white/10 bg-[#0f0f0f] p-3">
+              <svg className="h-64 w-full" viewBox="0 0 640 260" role="img" aria-label="Live growth line graph">
+                {[0, 1, 2, 3].map((row) => (
+                  <line
+                    key={row}
+                    stroke="rgba(255,255,255,0.08)"
+                    strokeWidth="1"
+                    x1="0"
+                    x2="640"
+                    y1={20 + row * 60}
+                    y2={20 + row * 60}
+                  />
+                ))}
+                <path
+                  d={buildLinePath(growthPoints, "supports", maxGrowthValue, 640, 220)}
+                  fill="none"
+                  stroke="#c9a84c"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="5"
+                  transform="translate(0 20)"
+                />
+                <path
+                  d={buildLinePath(growthPoints, "clicks", maxGrowthValue, 640, 220)}
+                  fill="none"
+                  stroke="#6fb6ff"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="4"
+                  transform="translate(0 20)"
+                />
+                <path
+                  d={buildLinePath(growthPoints, "listens", maxGrowthValue, 640, 220)}
+                  fill="none"
+                  stroke="#ff7ac8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="4"
+                  transform="translate(0 20)"
+                />
+                {growthPoints.map((point, index) => (
+                  <text
+                    key={point.label}
+                    fill="rgba(237,232,223,0.46)"
+                    fontSize="18"
+                    fontWeight="700"
+                    textAnchor={index === 0 ? "start" : index === growthPoints.length - 1 ? "end" : "middle"}
+                    x={(640 / Math.max(1, growthPoints.length - 1)) * index}
+                    y="255"
+                  >
+                    {point.label}
+                  </text>
+                ))}
+              </svg>
+            </div>
+            <div className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
+              <div className="rounded-xl bg-[#1f1f1f] p-3">
+                <b className="block text-xl text-white">{state.supports.length}</b>
+                <span className="text-[#ede8df]/50">support events captured</span>
+              </div>
+              <div className="rounded-xl bg-[#1f1f1f] p-3">
+                <b className="block text-xl text-white">{state.shares.length}</b>
+                <span className="text-[#ede8df]/50">share/click events captured</span>
+              </div>
+              <div className="rounded-xl bg-[#1f1f1f] p-3">
+                <b className="block text-xl text-white">{state.listens.length}</b>
+                <span className="text-[#ede8df]/50">listen taps captured</span>
+              </div>
+            </div>
           </div>
 
           <div className="mt-5 grid gap-5 lg:grid-cols-2">
