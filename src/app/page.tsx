@@ -58,6 +58,8 @@ type GrowthPoint = {
   listens: number;
 };
 
+type AppView = "campaign" | "create" | "dashboard";
+
 const STORAGE_KEY = "groundfloor-proof-engine-v1";
 
 const seedArtist: Artist = {
@@ -265,14 +267,20 @@ function GrowthChart({ points, maxValue, compact = false }: { points: GrowthPoin
   );
 }
 
-export function GroundFloorApp({ initialArtistSlug }: { initialArtistSlug?: string }) {
+export function GroundFloorApp({
+  initialArtistSlug,
+  initialView = "campaign",
+}: {
+  initialArtistSlug?: string;
+  initialView?: AppView;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const [state, setState] = useState<EngineState>(seedState);
   const [activeArtistId, setActiveArtistId] = useState(
     findArtistBySlug(seedState.artists, initialArtistSlug)?.id ?? seedArtist.id,
   );
-  const [view, setView] = useState<"campaign" | "create" | "dashboard">("campaign");
+  const [view, setView] = useState<AppView>(initialView);
   const [supportAmount, setSupportAmount] = useState(10);
   const [supporterName, setSupporterName] = useState("");
   const [supporterEmail, setSupporterEmail] = useState("");
@@ -366,6 +374,13 @@ export function GroundFloorApp({ initialArtistSlug }: { initialArtistSlug?: stri
     }
   }
 
+  function goToView(nextView: AppView) {
+    setView(nextView);
+
+    const nextPath = nextView === "campaign" ? activeArtistPath : nextView === "create" ? "/create" : "/operator";
+    if (pathname !== nextPath) router.push(nextPath);
+  }
+
   function addArtist(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -455,8 +470,7 @@ export function GroundFloorApp({ initialArtistSlug }: { initialArtistSlug?: stri
           <button
             className="font-display text-3xl uppercase tracking-[0.04em] text-[#c9a84c]"
             onClick={() => {
-              setView("campaign");
-              router.push(activeArtistPath);
+              goToView("campaign");
             }}
           >
             GroundFloor
@@ -468,7 +482,7 @@ export function GroundFloorApp({ initialArtistSlug }: { initialArtistSlug?: stri
                 className={`rounded-full px-3 py-2 transition sm:px-4 ${
                   view === item ? "bg-[#c9a84c] text-[#0a0a0a]" : "text-[#ede8df]/70"
                 }`}
-                onClick={() => setView(item)}
+                onClick={() => goToView(item)}
               >
                 {viewLabels[item]}
               </button>
