@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 
 type Artist = {
   id: string;
@@ -148,6 +149,22 @@ function getReferralCode(name: string) {
   return `${base || "fan"}-${Math.random().toString(36).slice(2, 6)}`;
 }
 
+function getArtistSlug(artist: Pick<Artist, "id" | "name">) {
+  const fromName = artist.name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 48);
+
+  return fromName || artist.id;
+}
+
+function findArtistBySlug(artists: Artist[], slug?: string | null) {
+  if (!slug) return null;
+  return artists.find((artist) => artist.id === slug || getArtistSlug(artist) === slug) ?? null;
+}
+
 function buildGrowthPoints(state: EngineState, artistId?: string) {
   const day = 24 * 60 * 60 * 1000;
   const now = Date.now();
@@ -248,9 +265,13 @@ function GrowthChart({ points, maxValue, compact = false }: { points: GrowthPoin
   );
 }
 
-export default function Home() {
+export function GroundFloorApp({ initialArtistSlug }: { initialArtistSlug?: string }) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [state, setState] = useState<EngineState>(seedState);
-  const [activeArtistId, setActiveArtistId] = useState(seedArtist.id);
+  const [activeArtistId, setActiveArtistId] = useState(
+    findArtistBySlug(seedState.artists, initialArtistSlug)?.id ?? seedArtist.id,
+  );
   const [view, setView] = useState<"campaign" | "create" | "dashboard">("campaign");
   const [supportAmount, setSupportAmount] = useState(10);
   const [supporterName, setSupporterName] = useState("");
@@ -267,19 +288,21 @@ export default function Home() {
       const parsed = JSON.parse(saved) as EngineState;
       if (parsed.artists?.length) {
         queueMicrotask(() => {
-          setState({
+          const nextState = {
             artists: parsed.artists,
             supports: parsed.supports ?? [],
             shares: parsed.shares ?? [],
             listens: parsed.listens ?? [],
-          });
-          setActiveArtistId(parsed.artists[0].id);
+          };
+          const routeArtist = findArtistBySlug(nextState.artists, initialArtistSlug);
+          setState(nextState);
+          setActiveArtistId(routeArtist?.id ?? parsed.artists[0].id);
         });
       }
     } catch {
       window.localStorage.removeItem(STORAGE_KEY);
     }
-  }, []);
+  }, [initialArtistSlug]);
 
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -289,6 +312,8 @@ export default function Home() {
     () => state.artists.find((artist) => artist.id === activeArtistId) ?? state.artists[0],
     [activeArtistId, state.artists],
   );
+  const activeArtistSlug = getArtistSlug(activeArtist);
+  const activeArtistPath = `/artist/${activeArtistSlug}`;
 
   const artistSupports = useMemo(
     () => state.supports.filter((support) => support.artistId === activeArtist.id),
@@ -328,7 +353,18 @@ export default function Home() {
   const referralUrl =
     typeof window === "undefined"
       ? ""
-      : `${window.location.origin}?artist=${activeArtist.id}&ref=${latestSupport?.referralCode ?? "early"}`;
+      : `${window.location.origin}${activeArtistPath}?ref=${latestSupport?.referralCode ?? "early"}`;
+
+  function showArtist(artist: Artist, pushRoute = true) {
+    setActiveArtistId(artist.id);
+    setLatestBadgeId(null);
+    setView("campaign");
+
+    if (pushRoute) {
+      const nextPath = `/artist/${getArtistSlug(artist)}`;
+      if (pathname !== nextPath) router.push(nextPath);
+    }
+  }
 
   function addArtist(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -362,6 +398,7 @@ export default function Home() {
     setLatestBadgeId(null);
     setView("campaign");
     setCreateMode("artist");
+    router.push(`/artist/${getArtistSlug(artist)}`);
     event.currentTarget.reset();
   }
 
@@ -417,7 +454,10 @@ export default function Home() {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
           <button
             className="font-display text-3xl uppercase tracking-[0.04em] text-[#c9a84c]"
-            onClick={() => setView("campaign")}
+            onClick={() => {
+              setView("campaign");
+              router.push(activeArtistPath);
+            }}
           >
             GroundFloor
           </button>
@@ -449,10 +489,7 @@ export default function Home() {
                   {state.artists.map((artist) => (
                     <button
                       key={artist.id}
-                      onClick={() => {
-                        setActiveArtistId(artist.id);
-                        setLatestBadgeId(null);
-                      }}
+                      onClick={() => showArtist(artist)}
                       className={`rounded-full border px-3 py-2 text-sm font-bold transition ${
                         artist.id === activeArtist.id
                           ? "border-[#c9a84c] bg-[#c9a84c] text-[#0a0a0a]"
@@ -799,6 +836,24 @@ export default function Home() {
               {createMode === "fan" ? "Nominate artist" : "Publish test page"}
             </button>
           </form>
+          <div className="mt-6 rounded-2xl border border-white/10 bg-[#141414] p-5">
+            <p className="section-kicker">Shareable artist links</p>
+            <div className="mt-4 grid gap-3">
+              {state.artists.map((artist) => (
+                <button
+                  key={artist.id}
+                  className="flex flex-col gap-1 rounded-xl border border-white/10 bg-[#1f1f1f] p-4 text-left transition hover:border-[#c9a84c]/60 sm:flex-row sm:items-center sm:justify-between"
+                  onClick={() => showArtist(artist)}
+                >
+                  <span>
+                    <b className="block text-white">{artist.name}</b>
+                    <span className="text-sm text-[#ede8df]/45">/artist/{getArtistSlug(artist)}</span>
+                  </span>
+                  <span className="text-sm font-black uppercase tracking-[0.12em] text-[#c9a84c]">Open page</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </section>
       )}
 
@@ -916,4 +971,8 @@ export default function Home() {
       )}
     </main>
   );
+}
+
+export default function Home() {
+  return <GroundFloorApp />;
 }
