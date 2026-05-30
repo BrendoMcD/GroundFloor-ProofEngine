@@ -20,6 +20,75 @@
     font-family: 'DM Sans', sans-serif;
     overflow: hidden; /* Hide outer scroll to force mobile app feel */
   }
+
+  .top-nav {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .nav-top-row {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .nav-logo-corner {
+    color: var(--gold);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.55rem;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    text-decoration: none;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    text-transform: uppercase;
+  }
+
+  .profile-link {
+    background: var(--gold);
+    border-radius: 999px;
+    color: var(--dark);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.55rem 0.9rem;
+    text-decoration: none;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .nav-links {
+    align-items: center;
+    display: flex;
+    gap: 0.6rem;
+    width: 100%;
+  }
+
+  .nav-links a,
+  .nav-links button {
+    align-items: center;
+    background: rgba(10,9,6,0.48);
+    border: 1px solid rgba(237,232,223,0.14);
+    border-radius: 999px;
+    color: var(--off-white);
+    display: flex;
+    flex: 1 1 0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    justify-content: center;
+    min-height: 2.15rem;
+    padding: 0.48rem 0.35rem;
+    text-align: center;
+    text-decoration: none;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    white-space: nowrap;
+  }
   
   /* Snap Scrolling Container */
   .feed-container {
@@ -159,17 +228,6 @@
     box-shadow: 0 0 10px rgba(201, 168, 76, 0.5);
   }
   
-  .nav-logo-corner {
-     position: absolute;
-     top: 20px;
-     left: 20px;
-     font-family: 'Bebas Neue', sans-serif;
-     font-size: 1.2rem;
-     color: rgba(255,255,255,0.5);
-     z-index: 20;
-     letter-spacing: 1px;
-  }
-
   /* Expandable Description */
   .track-description {
     font-size: 0.85rem;
@@ -330,12 +388,7 @@
 
   /* Feed Search */
   .feed-search-btn {
-    color: rgba(255,255,255,0.8);
-    font-size: 1.2rem;
-    background: none;
-    border: none;
     cursor: pointer;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
   }
   .feed-search-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
@@ -368,15 +421,23 @@
 
   @media (max-width: 768px) {
     .top-nav {
-      left: 14px !important;
-      right: 14px !important;
-      top: 14px !important;
+      left: 14px;
+      right: 14px;
+      top: 14px;
     }
-    .top-nav .nav-links {
-      gap: 0.75rem !important;
+    .nav-logo-corner {
+      font-size: 1.45rem;
     }
-    .top-nav .nav-links a:not(.nav-avatar) {
-      font-size: 0.78rem !important;
+    .profile-link {
+      font-size: 0.6rem;
+      padding: 0.5rem 0.65rem;
+    }
+    .nav-links {
+      gap: 0.38rem;
+    }
+    .nav-links a,
+    .nav-links button {
+      font-size: 0.66rem;
     }
     .song-title {
       font-size: clamp(2.1rem, 13vw, 3rem);
@@ -386,7 +447,7 @@
       font-size: 0.9rem;
     }
     .top-banner {
-      padding: 5.25rem 1rem 4rem;
+      padding: 7.4rem 1rem 4rem;
     }
     .right-actions {
       right: 12px;
@@ -443,11 +504,14 @@
   }
 
   @media (max-width: 390px) {
-    .top-nav .nav-links {
-      gap: 0.5rem !important;
+    .nav-links {
+      gap: 0.3rem;
     }
-    .top-nav .nav-links a:not(.nav-avatar) {
-      font-size: 0.72rem !important;
+    .nav-links a,
+    .nav-links button {
+      font-size: 0.6rem;
+      padding-left: 0.2rem;
+      padding-right: 0.2rem;
     }
     .song-title {
       padding: 0 2.5rem;
@@ -464,12 +528,15 @@
 </head>
 <body>
 
-<div class="top-nav" style="position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; z-index: 20;">
-  <a href="/" class="nav-logo-corner" style="position: relative; top: 0; left: 0; text-decoration: none; color: rgba(255,255,255,0.8);">GF</a>
-  <div class="nav-links" style="display: flex; gap: 1.5rem; align-items: center;">
-    <button class="feed-search-btn" onclick="openSearch()" style="color: white; background: none; border: none; font-size: 1.1rem; cursor: pointer; text-shadow: 0 1px 4px rgba(0,0,0,0.8);">🔍</button>
-    <a href="/discovery" style="color: white; text-decoration: none; font-size: 0.9rem; font-weight: 500; text-shadow: 0 1px 4px rgba(0,0,0,0.8);">Discover</a>
-    <a href="/profile" class="nav-avatar" style="width: 30px; height: 30px; border-radius: 50%; background: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop') center/cover; border: 1px solid var(--gold); display: block; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.8);"></a>
+<div class="top-nav">
+  <div class="nav-top-row">
+    <a href="/" class="nav-logo-corner">GroundFloor</a>
+    <a href="/profile" class="profile-link">My Profile</a>
+  </div>
+  <div class="nav-links">
+    <button class="feed-search-btn" onclick="openSearch()">Search</button>
+    <a href="/discovery">Discover</a>
+    <a href="/create">Create Page</a>
   </div>
 </div>
 
