@@ -32,9 +32,15 @@
   /* ── NAV ── */
   nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex; align-items: flex-start; flex-direction: column; gap: 0.75rem;
     padding: 1.25rem 3rem;
     background: linear-gradient(to bottom, rgba(10,9,6,0.95) 0%, transparent 100%);
+  }
+  .nav-top-row {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
   }
   .nav-logo {
     font-family: 'Bebas Neue', sans-serif;
@@ -61,6 +67,7 @@
     display: flex;
     gap: 1.5rem;
     align-items: center;
+    flex-wrap: wrap;
   }
 
   .nav-links a {
@@ -69,6 +76,16 @@
     font-size: 0.9rem;
     font-weight: 500;
     transition: color 0.2s;
+  }
+  .nav-profile {
+    color: var(--dark);
+    background: var(--gold);
+    padding: 0.6rem 1.1rem;
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
   /* ── HERO ── */
@@ -350,40 +367,40 @@
       padding: 0.9rem 1.25rem 1rem;
       background: linear-gradient(to bottom, rgba(10,9,6,0.98) 0%, rgba(10,9,6,0.82) 72%, transparent 100%);
     }
+    .nav-top-row {
+      gap: 1rem;
+    }
     .nav-logo {
       font-size: 1.45rem;
       line-height: 1;
       max-width: 100%;
     }
+    .nav-profile {
+      border-radius: 999px;
+      font-size: 0.62rem;
+      padding: 0.55rem 0.72rem;
+      white-space: nowrap;
+    }
     .nav-links {
       display: flex !important;
-      gap: 0.35rem !important;
-      overflow-x: auto;
+      gap: 0.38rem !important;
       padding-bottom: 0.15rem;
-      scrollbar-width: none;
       width: 100%;
     }
-    .nav-links::-webkit-scrollbar {
-      display: none;
-    }
-    .nav-links a,
-    .nav-cta {
+    .nav-links a {
       align-items: center;
       border: 1px solid rgba(237,232,223,0.16);
       border-radius: 999px;
       display: flex;
-      flex: 0 0 auto;
-      font-size: 0.64rem !important;
+      flex: 1 1 0;
+      font-size: 0.66rem !important;
       justify-content: center;
       letter-spacing: 0.08em;
       line-height: 1.1;
       min-height: 2.15rem;
-      padding: 0.5rem 0.58rem !important;
+      padding: 0.5rem 0.3rem !important;
       text-align: center;
       white-space: nowrap;
-    }
-    .nav-cta {
-      margin-left: 0 !important;
     }
     .hero {
       height: auto;
@@ -449,12 +466,16 @@
     .nav-logo {
       font-size: 1.32rem;
     }
-    .nav-links a,
-    .nav-cta {
-      font-size: 0.6rem !important;
+    .nav-profile {
+      font-size: 0.58rem;
+      padding-left: 0.62rem;
+      padding-right: 0.62rem;
+    }
+    .nav-links a {
+      font-size: 0.61rem !important;
       min-height: 2.05rem;
-      padding-left: 0.48rem !important;
-      padding-right: 0.48rem !important;
+      padding-left: 0.22rem !important;
+      padding-right: 0.22rem !important;
     }
     .hero {
       min-height: 840px;
@@ -610,12 +631,14 @@
 
 <!-- NAV -->
 <nav>
-  <div class="nav-logo">GroundFloor</div>
+  <div class="nav-top-row">
+    <div class="nav-logo">GroundFloor</div>
+    <a class="nav-profile" href="/profile">My Profile</a>
+  </div>
   <div class="nav-links" style="display: flex; gap: 1.5rem; align-items: center;">
     <a href="/discovery" style="color: var(--off-white); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.2s;">Discover</a>
     <a href="/feed" style="color: var(--off-white); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.2s;">Feed</a>
     <a href="/create" style="color: var(--off-white); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.2s;">Create Page</a>
-    <button class="nav-cta" onclick="window.location.href='/signin'" style="margin-left: 1rem;">Sign In / Join</button>
   </div>
 </nav>
 

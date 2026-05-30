@@ -348,7 +348,6 @@ export function GroundFloorApp({
     { label: "Create", view: "create" as const },
     { label: "Artist", view: "campaign" as const },
     { label: "Operator", view: "dashboard" as const },
-    { label: "Profile", path: "/profile" },
   ];
   const publicGrowthPoints = useMemo(() => buildGrowthPoints(state, activeArtist.id), [activeArtist.id, state]);
   const maxPublicGrowthValue = Math.max(
@@ -498,16 +497,24 @@ export function GroundFloorApp({
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-[#ede8df]">
       <header className="fixed left-0 top-0 z-30 w-full border-b border-white/10 bg-[#0a0a0a]/85 px-4 py-3 backdrop-blur-md sm:px-6">
-        <div className="mx-auto flex max-w-6xl flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <button
-            className="font-display text-3xl uppercase tracking-[0.04em] text-[#c9a84c]"
-            onClick={() => {
-              router.push("/");
-            }}
-          >
-            GroundFloor
-          </button>
-          <nav className="flex w-full flex-nowrap gap-1 overflow-x-auto rounded-full border border-white/10 bg-white/[0.04] p-1 text-xs font-bold [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:w-auto sm:justify-end sm:text-sm">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3">
+          <div className="flex w-full items-center justify-between gap-3">
+            <button
+              className="font-display text-3xl uppercase tracking-[0.04em] text-[#c9a84c]"
+              onClick={() => {
+                router.push("/");
+              }}
+            >
+              GroundFloor
+            </button>
+            <button
+              className="rounded-full border border-[#c9a84c]/45 px-3 py-2 text-[0.62rem] font-black uppercase tracking-[0.08em] text-[#c9a84c] transition hover:border-[#c9a84c] hover:bg-[#c9a84c]/10 sm:px-4 sm:text-xs"
+              onClick={() => router.push("/profile")}
+            >
+              My Profile
+            </button>
+          </div>
+          <nav className="flex w-full flex-nowrap justify-between gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1 text-[0.68rem] font-bold sm:ml-auto sm:w-auto sm:justify-end sm:text-sm">
             {siteNav.map((item) => {
               const isActive =
                 "view" in item
@@ -517,7 +524,7 @@ export function GroundFloorApp({
               return (
               <button
                 key={item.label}
-                className={`shrink-0 rounded-full px-3 py-2 transition sm:px-4 ${
+                className={`shrink-0 rounded-full px-2 py-2 transition sm:px-4 ${
                   isActive ? "bg-[#c9a84c] text-[#0a0a0a]" : "text-[#ede8df]/70"
                 }`}
                 onClick={() => {
@@ -539,7 +546,7 @@ export function GroundFloorApp({
 
       {view === "campaign" && (
         <>
-          <section className="relative overflow-hidden pt-28 sm:pt-16">
+          <section className="relative overflow-hidden pt-36 sm:pt-16">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(201,168,76,0.28),transparent_28%),linear-gradient(120deg,rgba(31,31,31,0.95),rgba(10,10,10,0.88)),url('https://images.unsplash.com/photo-1598387181032-a3103a2db5b3?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center" />
             <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0a0a0a] to-transparent" />
             <div className="relative mx-auto grid max-w-6xl gap-8 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[minmax(0,1fr)_360px] lg:py-24">
@@ -944,7 +951,7 @@ export function GroundFloorApp({
       )}
 
       {view === "create" && (
-        <section className="mx-auto max-w-5xl px-4 pb-24 pt-28 sm:px-6">
+        <section className="mx-auto max-w-5xl px-4 pb-24 pt-40 sm:px-6 sm:pt-28">
           <p className="section-kicker">Create or nominate</p>
           <h1 className="font-display mt-3 max-w-3xl text-6xl uppercase leading-[0.9] text-white sm:text-7xl">
             Start a page people can rally around.
@@ -1040,7 +1047,7 @@ export function GroundFloorApp({
       )}
 
       {view === "dashboard" && (
-        <section className="mx-auto max-w-6xl px-4 pb-24 pt-28 sm:px-6">
+        <section className="mx-auto max-w-6xl px-4 pb-24 pt-40 sm:px-6 sm:pt-28">
           <p className="section-kicker">Private operator dashboard</p>
           <h1 className="font-display mt-3 max-w-4xl text-6xl uppercase leading-[0.9] text-white sm:text-7xl">
             The raw engine behind public proof.

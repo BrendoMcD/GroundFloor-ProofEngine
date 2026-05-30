@@ -30,9 +30,16 @@
   /* Nav */
   nav {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.8rem;
     margin-bottom: 2rem;
+  }
+  .nav-top-row {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
   }
   .nav-logo {
     font-family: 'Bebas Neue', sans-serif;
@@ -43,9 +50,20 @@
   }
 
 
-  .nav-links { display: flex; gap: 1.5rem; }
+  .nav-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
   .nav-links a { color: var(--off-white); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
   .nav-links a:hover { color: var(--gold); }
+  .nav-profile {
+    color: var(--dark);
+    background: var(--gold);
+    border-radius: 999px;
+    padding: 0.55rem 0.9rem;
+    text-decoration: none;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
   header { text-align: center; margin-bottom: 4rem; }
   h1 { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; }
   p.subtitle { color: var(--muted); margin-top: 0.5rem; font-size: 1.1rem; }
@@ -335,31 +353,33 @@
       gap: 0.8rem;
       margin-bottom: 2.5rem;
     }
+    .nav-top-row {
+      gap: 1rem;
+    }
     .nav-logo {
       font-size: 1.45rem;
       line-height: 1;
     }
+    .nav-profile {
+      font-size: 0.6rem;
+      padding: 0.5rem 0.65rem;
+    }
     .nav-links {
       display: flex;
-      gap: 0.35rem;
-      overflow-x: auto;
+      gap: 0.38rem;
       padding-bottom: 0.15rem;
-      scrollbar-width: none;
       width: 100%;
-    }
-    .nav-links::-webkit-scrollbar {
-      display: none;
     }
     .nav-links a {
       align-items: center;
       border: 1px solid rgba(237,232,223,0.14);
       border-radius: 999px;
       display: flex;
-      flex: 0 0 auto;
-      font-size: 0.64rem;
+      flex: 1 1 0;
+      font-size: 0.66rem;
       justify-content: center;
       min-height: 2.15rem;
-      padding: 0.5rem 0.58rem;
+      padding: 0.5rem 0.3rem;
       text-align: center;
       white-space: nowrap;
     }
@@ -483,12 +503,14 @@
 <body>
 
 <nav>
-  <a href="/" class="nav-logo" style="text-decoration: none;">GroundFloor</a>
+  <div class="nav-top-row">
+    <a href="/" class="nav-logo" style="text-decoration: none;">GroundFloor</a>
+    <a href="/profile" class="nav-profile">My Profile</a>
+  </div>
   <div class="nav-links">
     <a href="/discovery" style="color: var(--gold);">Discover</a>
     <a href="/feed">Feed</a>
     <a href="/create">Create Page</a>
-    <a href="/signin">Sign In</a>
   </div>
 </nav>
 
