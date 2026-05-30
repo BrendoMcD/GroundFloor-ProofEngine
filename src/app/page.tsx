@@ -148,10 +148,13 @@ function getReferralCode(name: string) {
   return `${base || "fan"}-${Math.random().toString(36).slice(2, 6)}`;
 }
 
-function buildGrowthPoints(state: EngineState) {
+function buildGrowthPoints(state: EngineState, artistId?: string) {
   const day = 24 * 60 * 60 * 1000;
   const now = Date.now();
   const start = now - day * 6;
+  const supports = artistId ? state.supports.filter((support) => support.artistId === artistId) : state.supports;
+  const shares = artistId ? state.shares.filter((share) => share.artistId === artistId) : state.shares;
+  const listens = artistId ? state.listens.filter((listen) => listen.artistId === artistId) : state.listens;
 
   return Array.from({ length: 7 }, (_, index) => {
     const dayStart = start + day * index;
@@ -159,9 +162,9 @@ function buildGrowthPoints(state: EngineState) {
 
     return {
       label: new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(dayStart),
-      supports: state.supports.filter((support) => support.createdAt <= dayEnd).length,
-      clicks: state.shares.filter((share) => share.createdAt <= dayEnd).length,
-      listens: state.listens.filter((listen) => listen.createdAt <= dayEnd).length,
+      supports: supports.filter((support) => support.createdAt <= dayEnd).length,
+      clicks: shares.filter((share) => share.createdAt <= dayEnd).length,
+      listens: listens.filter((listen) => listen.createdAt <= dayEnd).length,
     };
   });
 }
@@ -176,6 +179,73 @@ function buildLinePath(points: GrowthPoint[], metric: GrowthMetric, maxValue: nu
       return `${index === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`;
     })
     .join(" ");
+}
+
+function GrowthChart({ points, maxValue, compact = false }: { points: GrowthPoint[]; maxValue: number; compact?: boolean }) {
+  const chartHeight = compact ? 150 : 220;
+  const viewHeight = compact ? 190 : 260;
+  const labelY = compact ? 184 : 255;
+
+  return (
+    <svg
+      className={compact ? "h-48 w-full" : "h-64 w-full"}
+      viewBox={`0 0 640 ${viewHeight}`}
+      role="img"
+      aria-label="Growth signal line graph"
+    >
+      {[0, 1, 2, 3].map((row) => (
+        <line
+          key={row}
+          stroke="rgba(255,255,255,0.08)"
+          strokeWidth="1"
+          x1="0"
+          x2="640"
+          y1={20 + row * (chartHeight / 4)}
+          y2={20 + row * (chartHeight / 4)}
+        />
+      ))}
+      <path
+        d={buildLinePath(points, "supports", maxValue, 640, chartHeight)}
+        fill="none"
+        stroke="#c9a84c"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={compact ? "4" : "5"}
+        transform="translate(0 20)"
+      />
+      <path
+        d={buildLinePath(points, "clicks", maxValue, 640, chartHeight)}
+        fill="none"
+        stroke="#6fb6ff"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={compact ? "3" : "4"}
+        transform="translate(0 20)"
+      />
+      <path
+        d={buildLinePath(points, "listens", maxValue, 640, chartHeight)}
+        fill="none"
+        stroke="#ff7ac8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={compact ? "3" : "4"}
+        transform="translate(0 20)"
+      />
+      {points.map((point, index) => (
+        <text
+          key={point.label}
+          fill="rgba(237,232,223,0.46)"
+          fontSize={compact ? "16" : "18"}
+          fontWeight="700"
+          textAnchor={index === 0 ? "start" : index === points.length - 1 ? "end" : "middle"}
+          x={(640 / Math.max(1, points.length - 1)) * index}
+          y={labelY}
+        >
+          {point.label}
+        </text>
+      ))}
+    </svg>
+  );
 }
 
 export default function Home() {
@@ -237,6 +307,16 @@ export default function Home() {
 
   const raised = artistSupports.reduce((sum, support) => sum + support.amount, 0);
   const progress = Math.min(100, Math.round((raised / activeArtist.goal) * 100));
+  const viewLabels = {
+    campaign: "Artist",
+    create: "Create",
+    dashboard: "Operator",
+  };
+  const publicGrowthPoints = useMemo(() => buildGrowthPoints(state, activeArtist.id), [activeArtist.id, state]);
+  const maxPublicGrowthValue = Math.max(
+    1,
+    ...publicGrowthPoints.flatMap((point) => [point.supports, point.clicks, point.listens]),
+  );
   const growthPoints = useMemo(() => buildGrowthPoints(state), [state]);
   const maxGrowthValue = Math.max(
     1,
@@ -345,12 +425,12 @@ export default function Home() {
             {(["campaign", "create", "dashboard"] as const).map((item) => (
               <button
                 key={item}
-                className={`rounded-full px-3 py-2 capitalize transition sm:px-4 ${
+                className={`rounded-full px-3 py-2 transition sm:px-4 ${
                   view === item ? "bg-[#c9a84c] text-[#0a0a0a]" : "text-[#ede8df]/70"
                 }`}
                 onClick={() => setView(item)}
               >
-                {item}
+                {viewLabels[item]}
               </button>
             ))}
           </nav>
@@ -364,6 +444,7 @@ export default function Home() {
             <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0a0a0a] to-transparent" />
             <div className="relative mx-auto grid max-w-6xl gap-8 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[minmax(0,1fr)_360px] lg:py-24">
               <div>
+                <p className="section-kicker mb-4">Public artist page</p>
                 <div className="mb-5 flex flex-wrap gap-2">
                   {state.artists.map((artist) => (
                     <button
@@ -419,7 +500,7 @@ export default function Home() {
                     Fans can register early support, but the artist sets campaign terms after claiming the page.
                   </p>
                 )}
-                <div className="mt-5 grid grid-cols-3 gap-3 text-sm">
+                <div className="mt-5 grid gap-3 text-sm sm:grid-cols-3">
                   <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3">
                     <b className="block text-xl text-white">{artistSupports.length}</b>
                     <span className="text-[#ede8df]/55">supporters</span>
@@ -491,6 +572,53 @@ export default function Home() {
                     <b className="block text-lg text-white">{artistListens.length}</b>
                     <span className="text-[#ede8df]/50">listen taps</span>
                   </div>
+                </div>
+              </article>
+
+              <article className="rounded-2xl border border-white/10 bg-[#141414] p-5 sm:p-7">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <p className="section-kicker">Supporter-visible data</p>
+                    <h2 className="font-display mt-2 text-4xl uppercase text-white">Growth signals</h2>
+                  </div>
+                  <div className="flex flex-wrap gap-2 text-[0.65rem] font-black uppercase tracking-[0.12em]">
+                    <span className="rounded-full bg-[#c9a84c]/15 px-3 py-1 text-[#c9a84c]">Pledges</span>
+                    <span className="rounded-full bg-[#6fb6ff]/15 px-3 py-1 text-[#6fb6ff]">Shares</span>
+                    <span className="rounded-full bg-[#ff7ac8]/15 px-3 py-1 text-[#ff7ac8]">Listens</span>
+                  </div>
+                </div>
+                <div className="mt-5 overflow-hidden rounded-xl border border-white/10 bg-[#0f0f0f] p-3">
+                  <GrowthChart points={publicGrowthPoints} maxValue={maxPublicGrowthValue} compact />
+                </div>
+                <p className="mt-3 text-sm leading-6 text-[#ede8df]/55">
+                  Supporters can see the same public proof loop they are helping create, without exposing private
+                  emails or operator notes.
+                </p>
+              </article>
+
+              <article className="rounded-2xl border border-white/10 bg-[#141414] p-5 sm:p-7">
+                <p className="section-kicker">Early Believers</p>
+                <div className="mt-4 grid gap-3">
+                  {artistSupports.length ? (
+                    artistSupports.slice(0, 4).map((support, index) => (
+                      <div
+                        key={support.id}
+                        className="flex flex-col gap-2 rounded-xl border border-white/10 bg-[#1f1f1f] p-4 sm:flex-row sm:items-center sm:justify-between"
+                      >
+                        <div>
+                          <p className="font-black text-white">
+                            #{artistSupports.length - index} {support.supporterName}
+                          </p>
+                          <p className="text-sm text-[#ede8df]/50">{support.reason}</p>
+                        </div>
+                        <p className="font-display text-3xl text-[#c9a84c]">{money(support.amount)}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="rounded-xl border border-white/10 bg-[#1f1f1f] p-4 text-sm text-[#ede8df]/55">
+                      No supporters yet. The first pledge becomes Early Believer #1.
+                    </p>
+                  )}
                 </div>
               </article>
             </div>
@@ -676,10 +804,14 @@ export default function Home() {
 
       {view === "dashboard" && (
         <section className="mx-auto max-w-6xl px-4 pb-24 pt-28 sm:px-6">
-          <p className="section-kicker">Proof dashboard</p>
+          <p className="section-kicker">Private operator dashboard</p>
           <h1 className="font-display mt-3 max-w-4xl text-6xl uppercase leading-[0.9] text-white sm:text-7xl">
-            Investor questions, answered with behavior.
+            The raw engine behind public proof.
           </h1>
+          <p className="mt-4 max-w-2xl text-lg leading-7 text-[#ede8df]/65">
+            Supporters see proof signals. Operators see the private records, claim status, emails, and reasons needed to
+            run the campaign.
+          </p>
 
           <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {[
@@ -709,59 +841,7 @@ export default function Home() {
               </div>
             </div>
             <div className="mt-5 overflow-hidden rounded-xl border border-white/10 bg-[#0f0f0f] p-3">
-              <svg className="h-64 w-full" viewBox="0 0 640 260" role="img" aria-label="Live growth line graph">
-                {[0, 1, 2, 3].map((row) => (
-                  <line
-                    key={row}
-                    stroke="rgba(255,255,255,0.08)"
-                    strokeWidth="1"
-                    x1="0"
-                    x2="640"
-                    y1={20 + row * 60}
-                    y2={20 + row * 60}
-                  />
-                ))}
-                <path
-                  d={buildLinePath(growthPoints, "supports", maxGrowthValue, 640, 220)}
-                  fill="none"
-                  stroke="#c9a84c"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="5"
-                  transform="translate(0 20)"
-                />
-                <path
-                  d={buildLinePath(growthPoints, "clicks", maxGrowthValue, 640, 220)}
-                  fill="none"
-                  stroke="#6fb6ff"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="4"
-                  transform="translate(0 20)"
-                />
-                <path
-                  d={buildLinePath(growthPoints, "listens", maxGrowthValue, 640, 220)}
-                  fill="none"
-                  stroke="#ff7ac8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="4"
-                  transform="translate(0 20)"
-                />
-                {growthPoints.map((point, index) => (
-                  <text
-                    key={point.label}
-                    fill="rgba(237,232,223,0.46)"
-                    fontSize="18"
-                    fontWeight="700"
-                    textAnchor={index === 0 ? "start" : index === growthPoints.length - 1 ? "end" : "middle"}
-                    x={(640 / Math.max(1, growthPoints.length - 1)) * index}
-                    y="255"
-                  >
-                    {point.label}
-                  </text>
-                ))}
-              </svg>
+              <GrowthChart points={growthPoints} maxValue={maxGrowthValue} />
             </div>
             <div className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
               <div className="rounded-xl bg-[#1f1f1f] p-3">
@@ -810,6 +890,9 @@ export default function Home() {
                       <b className="text-white">{support.supporterName}</b> pledged{" "}
                       <b className="text-[#c9a84c]">{money(support.amount)}</b> to {artist?.name}
                       <span className="block text-[#ede8df]/45">Reason: {support.reason}</span>
+                      <span className="block break-all text-[#ede8df]/35">
+                        Private: {support.supporterEmail || "no email captured"} / ref {support.referralCode}
+                      </span>
                     </div>
                   );
                 })}
