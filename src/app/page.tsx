@@ -508,7 +508,7 @@ export function GroundFloorApp({
               GroundFloor
             </button>
             <button
-              className="rounded-full border border-[#c9a84c]/45 px-3 py-2 text-[0.62rem] font-black uppercase tracking-[0.08em] text-[#c9a84c] transition hover:border-[#c9a84c] hover:bg-[#c9a84c]/10 sm:px-4 sm:text-xs"
+              className="rounded-full bg-[#c9a84c] !px-[0.65rem] !py-[0.5rem] !text-[0.6rem] font-black uppercase !leading-none !tracking-normal text-[#0a0a0a] transition hover:opacity-90"
               onClick={() => router.push("/profile")}
             >
               My Profile
