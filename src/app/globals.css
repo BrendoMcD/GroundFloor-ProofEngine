@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0a0a;
+  --foreground: #ede8df;
 }
 
 @theme inline {
@@ -25,6 +25,46 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.font-display {
+  font-family: Impact, "Arial Narrow", var(--font-geist-sans), sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.section-kicker {
+  color: #c9a84c;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.field-label {
+  color: rgba(237, 232, 223, 0.72);
+  display: grid;
+  font-size: 0.875rem;
+  font-weight: 800;
+  gap: 0.35rem;
+}
+
+.field-input {
+  background: #101010;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.75rem;
+  color: #ede8df;
+  padding: 0.8rem 0.9rem;
+  width: 100%;
+}
+
+.field-input::placeholder {
+  color: rgba(237, 232, 223, 0.32);
+}
+
+.field-input:focus {
+  border-color: rgba(201, 168, 76, 0.8);
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.14);
+  outline: none;
+}
+
 button,
 input,
 select,
@@ -39,5 +79,5 @@ button {
 input,
 select,
 textarea {
-  color: #161616;
+  color: #ede8df;
 }

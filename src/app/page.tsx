@@ -243,344 +243,361 @@ export default function Home() {
   }));
 
   return (
-    <main className="min-h-screen bg-[#f7f4ef] text-[#161616]">
-      <section className="mx-auto flex min-h-screen w-full max-w-6xl flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="px-4 pb-28 pt-4 sm:px-6 lg:px-10 lg:py-8">
-          <header className="sticky top-0 z-20 -mx-4 border-b border-black/10 bg-[#f7f4ef]/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:px-0">
-            <div className="flex items-center justify-between gap-3">
-              <button className="text-left text-xl font-black tracking-[0]">GroundFloor</button>
-              <div className="flex rounded-full border border-black/10 bg-white p-1 text-sm shadow-sm">
-                {(["campaign", "create", "dashboard"] as const).map((item) => (
-                  <button
-                    key={item}
-                    className={`rounded-full px-3 py-2 capitalize transition ${
-                      view === item ? "bg-[#161616] text-white" : "text-black/65"
-                    }`}
-                    onClick={() => setView(item)}
-                  >
-                    {item}
+    <main className="min-h-screen bg-[#0a0a0a] text-[#ede8df]">
+      <header className="fixed left-0 top-0 z-30 w-full border-b border-white/10 bg-[#0a0a0a]/85 px-4 py-3 backdrop-blur-md sm:px-6">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
+          <button
+            className="font-display text-3xl uppercase tracking-[0.04em] text-[#c9a84c]"
+            onClick={() => setView("campaign")}
+          >
+            GroundFloor
+          </button>
+          <nav className="flex rounded-full border border-white/10 bg-white/[0.04] p-1 text-xs font-bold sm:text-sm">
+            {(["campaign", "create", "dashboard"] as const).map((item) => (
+              <button
+                key={item}
+                className={`rounded-full px-3 py-2 capitalize transition sm:px-4 ${
+                  view === item ? "bg-[#c9a84c] text-[#0a0a0a]" : "text-[#ede8df]/70"
+                }`}
+                onClick={() => setView(item)}
+              >
+                {item}
+              </button>
+            ))}
+          </nav>
+        </div>
+      </header>
+
+      {view === "campaign" && (
+        <>
+          <section className="relative overflow-hidden pt-16">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(201,168,76,0.28),transparent_28%),linear-gradient(120deg,rgba(31,31,31,0.95),rgba(10,10,10,0.88)),url('https://images.unsplash.com/photo-1598387181032-a3103a2db5b3?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center" />
+            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0a0a0a] to-transparent" />
+            <div className="relative mx-auto grid max-w-6xl gap-8 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[minmax(0,1fr)_360px] lg:py-24">
+              <div>
+                <div className="mb-5 flex flex-wrap gap-2">
+                  {state.artists.map((artist) => (
+                    <button
+                      key={artist.id}
+                      onClick={() => {
+                        setActiveArtistId(artist.id);
+                        setLatestBadgeId(null);
+                      }}
+                      className={`rounded-full border px-3 py-2 text-sm font-bold transition ${
+                        artist.id === activeArtist.id
+                          ? "border-[#c9a84c] bg-[#c9a84c] text-[#0a0a0a]"
+                          : "border-white/15 bg-black/30 text-[#ede8df]/75"
+                      }`}
+                    >
+                      {artist.name}
+                    </button>
+                  ))}
+                </div>
+                <p className="mb-4 inline-flex rounded-full border border-[#c9a84c]/30 bg-[#c9a84c]/15 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-[#c9a84c]">
+                  {activeArtist.genre}
+                </p>
+                <h1 className="font-display max-w-3xl text-6xl uppercase leading-[0.88] tracking-[0.02em] text-white sm:text-8xl">
+                  {activeArtist.name}
+                </h1>
+                <p className="mt-5 max-w-2xl text-xl leading-8 text-[#ede8df]/82">
+                  {activeArtist.headline}
+                </p>
+              </div>
+
+              <aside className="rounded-2xl border border-white/10 bg-[#141414]/90 p-5 shadow-2xl shadow-black/35 backdrop-blur">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-[#c9a84c]">
+                  Campaign proof
+                </p>
+                <div className="mt-3 flex items-end justify-between gap-4">
+                  <p className="font-display text-5xl text-[#c9a84c]">{money(raised)}</p>
+                  <p className="pb-2 text-right text-sm font-bold text-[#ede8df]/55">
+                    of {money(activeArtist.goal)}
+                  </p>
+                </div>
+                <div className="mt-4 h-3 overflow-hidden rounded-full bg-white/10">
+                  <div className="h-full rounded-full bg-[#c9a84c]" style={{ width: `${progress}%` }} />
+                </div>
+                <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
+                  <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3">
+                    <b className="block text-xl text-white">{artistSupports.length}</b>
+                    <span className="text-[#ede8df]/55">supporters</span>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3">
+                    <b className="block text-xl text-white">{artistShares.length}</b>
+                    <span className="text-[#ede8df]/55">shares tracked</span>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </section>
+
+          <section className="mx-auto grid max-w-6xl gap-6 px-4 pb-28 sm:px-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+            <div className="grid gap-6">
+              <article className="rounded-2xl border border-white/10 bg-[#141414] p-5 sm:p-7">
+                <p className="section-kicker">Featured Song</p>
+                <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h2 className="font-display text-4xl uppercase text-white">{activeArtist.songTitle}</h2>
+                    <p className="mt-2 max-w-xl text-[#ede8df]/65">
+                      Support for this campaign can attach to the track, not just the artist profile.
+                    </p>
+                  </div>
+                  {activeArtist.songUrl && (
+                    <a
+                      className="inline-flex w-full items-center justify-center rounded-full border border-[#c9a84c]/40 px-5 py-3 text-sm font-black text-[#c9a84c] sm:w-auto"
+                      href={activeArtist.songUrl}
+                    >
+                      Listen
+                    </a>
+                  )}
+                </div>
+              </article>
+
+              <article className="rounded-2xl border border-white/10 bg-[#141414] p-5 sm:p-7">
+                <p className="section-kicker">Why Now</p>
+                <p className="mt-4 text-lg leading-8 text-[#ede8df]/78">{activeArtist.story}</p>
+              </article>
+
+              <article className="rounded-2xl border border-white/10 bg-[#141414] p-5 sm:p-7">
+                <p className="section-kicker">Public Proof</p>
+                <div className="mt-4 grid grid-cols-3 gap-2 text-center text-sm sm:gap-3">
+                  <div className="rounded-xl bg-[#1f1f1f] p-3">
+                    <b className="block text-lg text-white">{money(Math.round(raised * 0.82))}</b>
+                    <span className="text-[#ede8df]/50">ad budget</span>
+                  </div>
+                  <div className="rounded-xl bg-[#1f1f1f] p-3">
+                    <b className="block text-lg text-white">
+                      {Math.max(0, artistShares.length * 37 + artistSupports.length * 18)}
+                    </b>
+                    <span className="text-[#ede8df]/50">est. reach</span>
+                  </div>
+                  <div className="rounded-xl bg-[#1f1f1f] p-3">
+                    <b className="block text-lg text-white">{Math.max(0, artistSupports.length * 6)}</b>
+                    <span className="text-[#ede8df]/50">click intent</span>
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            <aside className="lg:sticky lg:top-24 lg:self-start">
+              <div className="rounded-2xl border border-[#c9a84c]/35 bg-[#141414] p-5 shadow-2xl shadow-black/30">
+                <h2 className="font-display text-4xl uppercase text-white">Back this artist</h2>
+                <p className="mt-2 text-sm leading-6 text-[#ede8df]/60">
+                  Phase 1 captures pledge intent before turning on real payment processing.
+                </p>
+
+                <form className="mt-5 grid gap-3" onSubmit={addSupport}>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[5, 10, 25].map((amount) => (
+                      <button
+                        key={amount}
+                        type="button"
+                        onClick={() => setSupportAmount(amount)}
+                        className={`rounded-xl border p-3 font-black transition ${
+                          supportAmount === amount
+                            ? "border-[#c9a84c] bg-[#c9a84c] text-[#0a0a0a]"
+                            : "border-white/10 bg-[#1f1f1f] text-[#ede8df]"
+                        }`}
+                      >
+                        ${amount}
+                      </button>
+                    ))}
+                  </div>
+                  <label className="field-label">
+                    Custom amount
+                    <input
+                      className="field-input"
+                      min="1"
+                      type="number"
+                      value={supportAmount}
+                      onChange={(event) => setSupportAmount(Number(event.target.value))}
+                    />
+                  </label>
+                  <label className="field-label">
+                    Name
+                    <input
+                      className="field-input"
+                      value={supporterName}
+                      onChange={(event) => setSupporterName(event.target.value)}
+                      placeholder="Brendo"
+                    />
+                  </label>
+                  <label className="field-label">
+                    Email
+                    <input
+                      className="field-input"
+                      type="email"
+                      value={supporterEmail}
+                      onChange={(event) => setSupporterEmail(event.target.value)}
+                      placeholder="you@example.com"
+                    />
+                  </label>
+                  <label className="field-label">
+                    Why are you supporting?
+                    <select
+                      className="field-input bg-[#101010]"
+                      value={supportReason}
+                      onChange={(event) => setSupportReason(event.target.value)}
+                    >
+                      {supportReasons.map((reason) => (
+                        <option key={reason}>{reason}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <button className="mt-2 rounded-xl bg-[#c9a84c] px-5 py-4 text-base font-black text-[#0a0a0a]">
+                    Pledge support
                   </button>
+                </form>
+
+                {latestSupport && (
+                  <div className="mt-5 rounded-2xl border border-[#c9a84c] bg-[#c9a84c]/10 p-4">
+                    <p className="section-kicker">Badge earned</p>
+                    <p className="mt-2 font-display text-3xl uppercase text-white">
+                      Early Believer #{artistSupports.length}
+                    </p>
+                    <p className="mt-1 text-sm text-[#ede8df]/65">
+                      {latestSupport.supporterName} backed {activeArtist.name} with {money(latestSupport.amount)}.
+                    </p>
+                    <button
+                      className="mt-3 w-full rounded-xl bg-[#ede8df] px-4 py-3 text-sm font-black text-[#0a0a0a]"
+                      onClick={() => trackShare(latestSupport.referralCode)}
+                    >
+                      Track share link
+                    </button>
+                    <p className="mt-2 break-all text-xs text-[#ede8df]/45">{referralUrl}</p>
+                  </div>
+                )}
+              </div>
+            </aside>
+          </section>
+        </>
+      )}
+
+      {view === "create" && (
+        <section className="mx-auto max-w-5xl px-4 pb-24 pt-28 sm:px-6">
+          <p className="section-kicker">Create or nominate</p>
+          <h1 className="font-display mt-3 max-w-3xl text-6xl uppercase leading-[0.9] text-white sm:text-7xl">
+            Start a page people can rally around.
+          </h1>
+          <form
+            className="mt-8 grid gap-4 rounded-2xl border border-white/10 bg-[#141414] p-5 sm:grid-cols-2 sm:p-7"
+            onSubmit={addArtist}
+          >
+            <label className="field-label">
+              Artist name
+              <input name="name" className="field-input" required />
+            </label>
+            <label className="field-label">
+              Genre / scene
+              <input name="genre" className="field-input" placeholder="Indie pop, college rap..." />
+            </label>
+            <label className="field-label sm:col-span-2">
+              Campaign headline
+              <input
+                name="headline"
+                className="field-input"
+                placeholder="Help this single find its first real audience."
+              />
+            </label>
+            <label className="field-label sm:col-span-2">
+              Why now?
+              <textarea name="story" className="field-input min-h-28" />
+            </label>
+            <label className="field-label">
+              Featured song
+              <input name="songTitle" className="field-input" />
+            </label>
+            <label className="field-label">
+              Song link
+              <input name="songUrl" className="field-input" placeholder="Spotify, SoundCloud, YouTube" />
+            </label>
+            <label className="field-label">
+              Campaign goal
+              <input name="goal" type="number" min="25" defaultValue="250" className="field-input" />
+            </label>
+            <label className="field-label">
+              Created by
+              <select name="mode" className="field-input bg-[#101010]">
+                <option value="artist">Artist</option>
+                <option value="fan">Fan nomination</option>
+              </select>
+            </label>
+            <label className="field-label">
+              Your name
+              <input name="creatorName" className="field-input" />
+            </label>
+            <label className="field-label">
+              Contact email
+              <input name="creatorEmail" type="email" className="field-input" />
+            </label>
+            <button className="rounded-xl bg-[#c9a84c] px-5 py-4 font-black text-[#0a0a0a] sm:col-span-2">
+              Publish test page
+            </button>
+          </form>
+        </section>
+      )}
+
+      {view === "dashboard" && (
+        <section className="mx-auto max-w-6xl px-4 pb-24 pt-28 sm:px-6">
+          <p className="section-kicker">Proof dashboard</p>
+          <h1 className="font-display mt-3 max-w-4xl text-6xl uppercase leading-[0.9] text-white sm:text-7xl">
+            Investor questions, answered with behavior.
+          </h1>
+
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ["Artist pages", state.artists.length],
+              ["Pledges", state.supports.length],
+              ["Raised intent", money(state.supports.reduce((sum, support) => sum + support.amount, 0))],
+              ["Tracked shares", state.shares.length],
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-2xl border border-white/10 bg-[#141414] p-4">
+                <p className="text-sm font-bold text-[#ede8df]/45">{label}</p>
+                <p className="font-display mt-2 text-4xl text-[#c9a84c]">{value}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-5 grid gap-5 lg:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-[#141414] p-5">
+              <h2 className="font-display text-4xl uppercase text-white">Supporter motivation</h2>
+              <div className="mt-4 grid gap-3">
+                {reasonCounts.map(({ reason, count }) => (
+                  <div key={reason}>
+                    <div className="flex justify-between text-sm font-bold text-[#ede8df]/72">
+                      <span>{reason}</span>
+                      <span>{count}</span>
+                    </div>
+                    <div className="mt-1 h-2 overflow-hidden rounded-full bg-white/10">
+                      <div
+                        className="h-full rounded-full bg-[#c9a84c]"
+                        style={{ width: `${artistSupports.length ? (count / artistSupports.length) * 100 : 0}%` }}
+                      />
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
-          </header>
 
-          {view === "campaign" && (
-            <section className="pt-8">
-              <div className="mb-5 flex flex-wrap items-center gap-2">
-                {state.artists.map((artist) => (
-                  <button
-                    key={artist.id}
-                    onClick={() => {
-                      setActiveArtistId(artist.id);
-                      setLatestBadgeId(null);
-                    }}
-                    className={`rounded-full border px-3 py-2 text-sm ${
-                      artist.id === activeArtist.id
-                        ? "border-[#161616] bg-[#161616] text-white"
-                        : "border-black/10 bg-white"
-                    }`}
-                  >
-                    {artist.name}
-                  </button>
-                ))}
-              </div>
-
-              <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
-                <article className="overflow-hidden rounded-[8px] border border-black/10 bg-white shadow-sm">
-                  <div className="bg-[#161616] p-5 text-white sm:p-8">
-                    <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-[#f0c85a]">
-                      {activeArtist.genre}
-                    </p>
-                    <h1 className="text-4xl font-black leading-[1.02] sm:text-6xl">
-                      {activeArtist.name}
-                    </h1>
-                    <p className="mt-4 max-w-2xl text-lg leading-7 text-white/78">
-                      {activeArtist.headline}
-                    </p>
-                  </div>
-
-                  <div className="grid gap-6 p-5 sm:p-8">
-                    <div>
-                      <p className="text-sm font-bold uppercase tracking-[0.18em] text-black/45">
-                        Featured song
-                      </p>
-                      <div className="mt-3 rounded-[8px] border border-black/10 bg-[#faf7f1] p-4">
-                        <div className="flex items-center justify-between gap-3">
-                          <div>
-                            <h2 className="text-2xl font-black">{activeArtist.songTitle}</h2>
-                            <p className="mt-1 text-sm text-black/60">Support can be tied to this track.</p>
-                          </div>
-                          {activeArtist.songUrl && (
-                            <a className="rounded-full bg-white px-3 py-2 text-sm font-bold" href={activeArtist.songUrl}>
-                              Listen
-                            </a>
-                          )}
-                        </div>
-                      </div>
+            <div className="rounded-2xl border border-white/10 bg-[#141414] p-5">
+              <h2 className="font-display text-4xl uppercase text-white">Recent evidence</h2>
+              <div className="mt-4 grid gap-3">
+                {state.supports.slice(0, 5).map((support) => {
+                  const artist = state.artists.find((item) => item.id === support.artistId);
+                  return (
+                    <div key={support.id} className="rounded-xl bg-[#1f1f1f] p-3 text-sm text-[#ede8df]/72">
+                      <b className="text-white">{support.supporterName}</b> pledged{" "}
+                      <b className="text-[#c9a84c]">{money(support.amount)}</b> to {artist?.name}
+                      <span className="block text-[#ede8df]/45">Reason: {support.reason}</span>
                     </div>
-
-                    <div>
-                      <p className="text-sm font-bold uppercase tracking-[0.18em] text-black/45">
-                        Campaign story
-                      </p>
-                      <p className="mt-3 text-lg leading-8 text-black/72">{activeArtist.story}</p>
-                    </div>
-
-                    <div className="rounded-[8px] border border-black/10 p-4">
-                      <div className="flex items-end justify-between gap-3">
-                        <div>
-                          <p className="text-sm font-bold uppercase tracking-[0.18em] text-black/45">
-                            Public proof
-                          </p>
-                          <p className="mt-2 text-3xl font-black">
-                            {money(raised)} <span className="text-base font-bold text-black/45">of {money(activeArtist.goal)}</span>
-                          </p>
-                        </div>
-                        <p className="text-right text-sm font-bold text-black/55">
-                          {artistSupports.length} supporters<br />
-                          {artistShares.length} shares tracked
-                        </p>
-                      </div>
-                      <div className="mt-4 h-3 overflow-hidden rounded-full bg-black/10">
-                        <div className="h-full rounded-full bg-[#f0c85a]" style={{ width: `${progress}%` }} />
-                      </div>
-                      <div className="mt-4 grid grid-cols-3 gap-2 text-center text-sm">
-                        <div className="rounded-[8px] bg-[#faf7f1] p-3">
-                          <b>{money(Math.round(raised * 0.82))}</b>
-                          <span className="block text-black/50">ad budget</span>
-                        </div>
-                        <div className="rounded-[8px] bg-[#faf7f1] p-3">
-                          <b>{Math.max(0, artistShares.length * 37 + artistSupports.length * 18)}</b>
-                          <span className="block text-black/50">est. reach</span>
-                        </div>
-                        <div className="rounded-[8px] bg-[#faf7f1] p-3">
-                          <b>{Math.max(0, artistSupports.length * 6)}</b>
-                          <span className="block text-black/50">click intent</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </article>
-
-                <aside className="rounded-[8px] border border-black/10 bg-white p-5 shadow-sm">
-                  <h2 className="text-2xl font-black">Back this artist</h2>
-                  <p className="mt-2 text-sm leading-6 text-black/60">
-                    Phase 1 captures pledge intent. Stripe can replace this form when you are ready for real payments.
-                  </p>
-
-                  <form className="mt-5 grid gap-3" onSubmit={addSupport}>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[5, 10, 25].map((amount) => (
-                        <button
-                          key={amount}
-                          type="button"
-                          onClick={() => setSupportAmount(amount)}
-                          className={`rounded-[8px] border p-3 font-black ${
-                            supportAmount === amount ? "border-[#161616] bg-[#161616] text-white" : "border-black/10"
-                          }`}
-                        >
-                          ${amount}
-                        </button>
-                      ))}
-                    </div>
-                    <label className="text-sm font-bold">
-                      Custom amount
-                      <input
-                        className="mt-1 w-full rounded-[8px] border border-black/15 px-3 py-3"
-                        min="1"
-                        type="number"
-                        value={supportAmount}
-                        onChange={(event) => setSupportAmount(Number(event.target.value))}
-                      />
-                    </label>
-                    <label className="text-sm font-bold">
-                      Name
-                      <input
-                        className="mt-1 w-full rounded-[8px] border border-black/15 px-3 py-3"
-                        value={supporterName}
-                        onChange={(event) => setSupporterName(event.target.value)}
-                        placeholder="Brendo"
-                      />
-                    </label>
-                    <label className="text-sm font-bold">
-                      Email
-                      <input
-                        className="mt-1 w-full rounded-[8px] border border-black/15 px-3 py-3"
-                        type="email"
-                        value={supporterEmail}
-                        onChange={(event) => setSupporterEmail(event.target.value)}
-                        placeholder="you@example.com"
-                      />
-                    </label>
-                    <label className="text-sm font-bold">
-                      Why are you supporting?
-                      <select
-                        className="mt-1 w-full rounded-[8px] border border-black/15 bg-white px-3 py-3"
-                        value={supportReason}
-                        onChange={(event) => setSupportReason(event.target.value)}
-                      >
-                        {supportReasons.map((reason) => (
-                          <option key={reason}>{reason}</option>
-                        ))}
-                      </select>
-                    </label>
-                    <button className="mt-2 rounded-[8px] bg-[#f0c85a] px-5 py-4 text-base font-black text-black">
-                      Pledge support
-                    </button>
-                  </form>
-
-                  {latestSupport && (
-                    <div className="mt-5 rounded-[8px] border border-[#f0c85a] bg-[#fff9df] p-4">
-                      <p className="text-sm font-bold uppercase tracking-[0.18em] text-black/45">
-                        Badge earned
-                      </p>
-                      <p className="mt-2 text-xl font-black">Early Believer #{artistSupports.length}</p>
-                      <p className="mt-1 text-sm text-black/60">
-                        {latestSupport.supporterName} backed {activeArtist.name} with {money(latestSupport.amount)}.
-                      </p>
-                      <button
-                        className="mt-3 w-full rounded-[8px] bg-[#161616] px-4 py-3 text-sm font-black text-white"
-                        onClick={() => trackShare(latestSupport.referralCode)}
-                      >
-                        Track share link
-                      </button>
-                      <p className="mt-2 break-all text-xs text-black/45">{referralUrl}</p>
-                    </div>
-                  )}
-                </aside>
+                  );
+                })}
               </div>
-            </section>
-          )}
-
-          {view === "create" && (
-            <section className="pt-8">
-              <div className="mb-5">
-                <p className="text-sm font-bold uppercase tracking-[0.18em] text-black/45">Create or nominate</p>
-                <h1 className="mt-2 text-4xl font-black leading-tight">Start a page people can rally around.</h1>
-              </div>
-              <form className="grid gap-4 rounded-[8px] border border-black/10 bg-white p-5 shadow-sm sm:grid-cols-2 sm:p-8" onSubmit={addArtist}>
-                <label className="text-sm font-bold">
-                  Artist name
-                  <input name="name" className="mt-1 w-full rounded-[8px] border border-black/15 px-3 py-3" required />
-                </label>
-                <label className="text-sm font-bold">
-                  Genre / scene
-                  <input name="genre" className="mt-1 w-full rounded-[8px] border border-black/15 px-3 py-3" placeholder="Indie pop, college rap..." />
-                </label>
-                <label className="text-sm font-bold sm:col-span-2">
-                  Campaign headline
-                  <input name="headline" className="mt-1 w-full rounded-[8px] border border-black/15 px-3 py-3" placeholder="Help this single find its first real audience." />
-                </label>
-                <label className="text-sm font-bold sm:col-span-2">
-                  Why now?
-                  <textarea name="story" className="mt-1 min-h-28 w-full rounded-[8px] border border-black/15 px-3 py-3" />
-                </label>
-                <label className="text-sm font-bold">
-                  Featured song
-                  <input name="songTitle" className="mt-1 w-full rounded-[8px] border border-black/15 px-3 py-3" />
-                </label>
-                <label className="text-sm font-bold">
-                  Song link
-                  <input name="songUrl" className="mt-1 w-full rounded-[8px] border border-black/15 px-3 py-3" placeholder="Spotify, SoundCloud, YouTube" />
-                </label>
-                <label className="text-sm font-bold">
-                  Campaign goal
-                  <input name="goal" type="number" min="25" defaultValue="250" className="mt-1 w-full rounded-[8px] border border-black/15 px-3 py-3" />
-                </label>
-                <label className="text-sm font-bold">
-                  Created by
-                  <select name="mode" className="mt-1 w-full rounded-[8px] border border-black/15 bg-white px-3 py-3">
-                    <option value="artist">Artist</option>
-                    <option value="fan">Fan nomination</option>
-                  </select>
-                </label>
-                <label className="text-sm font-bold">
-                  Your name
-                  <input name="creatorName" className="mt-1 w-full rounded-[8px] border border-black/15 px-3 py-3" />
-                </label>
-                <label className="text-sm font-bold">
-                  Contact email
-                  <input name="creatorEmail" type="email" className="mt-1 w-full rounded-[8px] border border-black/15 px-3 py-3" />
-                </label>
-                <button className="rounded-[8px] bg-[#161616] px-5 py-4 font-black text-white sm:col-span-2">
-                  Publish test page
-                </button>
-              </form>
-            </section>
-          )}
-
-          {view === "dashboard" && (
-            <section className="pt-8">
-              <p className="text-sm font-bold uppercase tracking-[0.18em] text-black/45">Proof dashboard</p>
-              <h1 className="mt-2 text-4xl font-black leading-tight">Investor questions, answered with behavior.</h1>
-
-              <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                {[
-                  ["Artist pages", state.artists.length],
-                  ["Pledges", state.supports.length],
-                  ["Raised intent", money(state.supports.reduce((sum, support) => sum + support.amount, 0))],
-                  ["Tracked shares", state.shares.length],
-                ].map(([label, value]) => (
-                  <div key={label} className="rounded-[8px] border border-black/10 bg-white p-4 shadow-sm">
-                    <p className="text-sm font-bold text-black/45">{label}</p>
-                    <p className="mt-2 text-3xl font-black">{value}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-5 grid gap-5 lg:grid-cols-2">
-                <div className="rounded-[8px] border border-black/10 bg-white p-5 shadow-sm">
-                  <h2 className="text-2xl font-black">Supporter motivation</h2>
-                  <div className="mt-4 grid gap-3">
-                    {reasonCounts.map(({ reason, count }) => (
-                      <div key={reason}>
-                        <div className="flex justify-between text-sm font-bold">
-                          <span>{reason}</span>
-                          <span>{count}</span>
-                        </div>
-                        <div className="mt-1 h-2 overflow-hidden rounded-full bg-black/10">
-                          <div
-                            className="h-full rounded-full bg-[#f0c85a]"
-                            style={{ width: `${artistSupports.length ? (count / artistSupports.length) * 100 : 0}%` }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="rounded-[8px] border border-black/10 bg-white p-5 shadow-sm">
-                  <h2 className="text-2xl font-black">Recent evidence</h2>
-                  <div className="mt-4 grid gap-3">
-                    {state.supports.slice(0, 5).map((support) => {
-                      const artist = state.artists.find((item) => item.id === support.artistId);
-                      return (
-                        <div key={support.id} className="rounded-[8px] bg-[#faf7f1] p-3 text-sm">
-                          <b>{support.supporterName}</b> pledged <b>{money(support.amount)}</b> to {artist?.name}
-                          <span className="block text-black/50">Reason: {support.reason}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </section>
-          )}
-        </div>
-
-        <aside className="border-t border-black/10 bg-[#161616] p-5 text-white lg:min-h-screen lg:border-l lg:border-t-0 lg:p-6">
-          <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#f0c85a]">Phase 1 engine</p>
-          <h2 className="mt-2 text-3xl font-black leading-tight">Build for answers, not applause.</h2>
-          <div className="mt-5 grid gap-3 text-sm leading-6 text-white/72">
-            <p><b className="text-white">Trust:</b> every pledge updates public progress and supporter count.</p>
-            <p><b className="text-white">Motivation:</b> every supporter chooses a reason.</p>
-            <p><b className="text-white">Status:</b> every pledge creates an Early Believer badge.</p>
-            <p><b className="text-white">Growth:</b> share clicks are tracked by referral code.</p>
-            <p><b className="text-white">Demand:</b> artist and fan-created pages are counted.</p>
+            </div>
           </div>
+
           <button
-            className="mt-6 w-full rounded-[8px] border border-white/20 px-4 py-3 text-sm font-black text-white"
+            className="mt-6 rounded-xl border border-white/15 px-4 py-3 text-sm font-black text-[#ede8df]/75"
             onClick={() => {
               window.localStorage.removeItem(STORAGE_KEY);
               setState(seedState);
@@ -591,8 +608,8 @@ export default function Home() {
           >
             Reset demo data
           </button>
-        </aside>
-      </section>
+        </section>
+      )}
     </main>
   );
 }
