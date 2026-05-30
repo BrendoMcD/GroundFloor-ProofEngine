@@ -450,16 +450,16 @@ export default function Home() {
                   </div>
                   {activeArtist.songUrl && (
                     <a
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#c9a84c] px-6 py-4 text-sm font-black uppercase tracking-[0.12em] text-[#0a0a0a] shadow-[0_0_32px_rgba(201,168,76,0.28)] transition hover:-translate-y-0.5 hover:bg-[#e0bf61] sm:w-auto"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#c9a84c] px-5 py-3 text-sm font-black uppercase tracking-[0.08em] text-[#0a0a0a] shadow-[0_0_24px_rgba(201,168,76,0.22)] transition hover:-translate-y-0.5 hover:bg-[#e0bf61] sm:w-auto"
                       href={activeArtist.songUrl}
                       onClick={trackListen}
                       target="_blank"
                       rel="noreferrer"
                     >
-                      <span className="grid size-6 place-items-center rounded-full bg-[#0a0a0a]" aria-hidden="true">
-                        <span className="ml-0.5 h-0 w-0 border-y-[5px] border-l-[8px] border-y-transparent border-l-[#c9a84c]" />
+                      <span className="grid size-5 place-items-center rounded-full bg-[#0a0a0a]" aria-hidden="true">
+                        <span className="ml-px h-0 w-0 border-y-[4px] border-l-[7px] border-y-transparent border-l-[#c9a84c]" />
                       </span>
-                      Listen now
+                      Listen
                     </a>
                   )}
                 </div>
