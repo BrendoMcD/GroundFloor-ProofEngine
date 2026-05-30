@@ -59,6 +59,7 @@ type GrowthPoint = {
 };
 
 type AppView = "campaign" | "create" | "dashboard";
+type SiteNavItem = { label: string; path: string } | { label: string; view: AppView };
 
 const STORAGE_KEY = "groundfloor-proof-engine-v1";
 
@@ -340,11 +341,14 @@ export function GroundFloorApp({
 
   const raised = artistSupports.reduce((sum, support) => sum + support.amount, 0);
   const progress = Math.min(100, Math.round((raised / activeArtist.goal) * 100));
-  const viewLabels = {
-    campaign: "Artist",
-    create: "Create",
-    dashboard: "Operator",
-  };
+  const siteNav: SiteNavItem[] = [
+    { label: "Discover", path: "/discovery" },
+    { label: "Feed", path: "/feed" },
+    { label: "Create", view: "create" as const },
+    { label: "Artist", view: "campaign" as const },
+    { label: "Operator", view: "dashboard" as const },
+    { label: "Profile", path: "/profile" },
+  ];
   const publicGrowthPoints = useMemo(() => buildGrowthPoints(state, activeArtist.id), [activeArtist.id, state]);
   const maxPublicGrowthValue = Math.max(
     1,
@@ -470,23 +474,37 @@ export function GroundFloorApp({
           <button
             className="font-display text-3xl uppercase tracking-[0.04em] text-[#c9a84c]"
             onClick={() => {
-              goToView("campaign");
+              router.push("/");
             }}
           >
             GroundFloor
           </button>
-          <nav className="flex rounded-full border border-white/10 bg-white/[0.04] p-1 text-xs font-bold sm:text-sm">
-            {(["campaign", "create", "dashboard"] as const).map((item) => (
+          <nav className="flex flex-wrap justify-end gap-1 rounded-2xl border border-white/10 bg-white/[0.04] p-1 text-xs font-bold sm:rounded-full sm:text-sm">
+            {siteNav.map((item) => {
+              const isActive =
+                "view" in item
+                  ? view === item.view
+                  : pathname === item.path || (item.path !== "/" && pathname.startsWith(item.path));
+
+              return (
               <button
-                key={item}
+                key={item.label}
                 className={`rounded-full px-3 py-2 transition sm:px-4 ${
-                  view === item ? "bg-[#c9a84c] text-[#0a0a0a]" : "text-[#ede8df]/70"
+                  isActive ? "bg-[#c9a84c] text-[#0a0a0a]" : "text-[#ede8df]/70"
                 }`}
-                onClick={() => goToView(item)}
+                onClick={() => {
+                  if ("view" in item) {
+                    goToView(item.view);
+                    return;
+                  }
+
+                  router.push(item.path);
+                }}
               >
-                {viewLabels[item]}
+                {item.label}
               </button>
-            ))}
+              );
+            })}
           </nav>
         </div>
       </header>

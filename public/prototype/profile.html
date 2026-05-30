@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supporter Profile - GroundFloor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,400;9..40,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --dark: #0a0a0a;
+      --dark2: #141414;
+      --dark3: #1f1f1f;
+      --gold: #c9a84c;
+      --off-white: #ede8df;
+      --muted: #888888;
+      --danger: #ff4a4a;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    html { scroll-behavior: smooth; scroll-padding-top: 100px; }
+    body {
+      background-color: var(--dark);
+      color: var(--off-white);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* Fixed Navigation */
+    .top-nav {
+      position: fixed;
+      top: 0; left: 0; width: 100%;
+      height: 70px;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      color: var(--gold);
+      text-decoration: none;
+      letter-spacing: 1px;
+    }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a {
+      color: var(--off-white);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 700;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+    .nav-links a:hover { opacity: 1; }
+    .nav-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop') center/cover;
+      border: 1px solid var(--gold);
+      display: block;
+      cursor: pointer;
+    }
+
+    /* Page Layout */
+    .page-container {
+      max-width: 1200px;
+      margin: 100px auto 5rem;
+      padding: 0 2rem;
+    }
+    
+    .page-header {
+      margin-bottom: 3rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--dark3);
+    }
+    .page-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3rem;
+      color: var(--gold);
+      letter-spacing: 1px;
+      line-height: 1;
+    }
+    
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 4rem;
+    }
+
+    /* Sidebar */
+    .sidebar-nav {
+      position: sticky;
+      top: 100px;
+    }
+    .sidebar-link {
+      display: block;
+      padding: 1rem 1.5rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 700;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      transition: all 0.2s;
+    }
+    .sidebar-link:hover {
+      background: var(--dark2);
+      color: var(--off-white);
+    }
+    .sidebar-link.active {
+      background: rgba(201, 168, 76, 0.1);
+      color: var(--gold);
+      border-left: 3px solid var(--gold);
+      border-radius: 0 8px 8px 0;
+    }
+
+    /* Form Elements */
+    .settings-section {
+      margin-bottom: 4rem;
+    }
+    .section-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: var(--off-white);
+      letter-spacing: 1px;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    label {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      background: var(--dark2);
+      border: 1px solid var(--dark3);
+      color: var(--off-white);
+      padding: 1rem;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+    .helper-text {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.4rem;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: var(--gold);
+      color: var(--dark);
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+    
+    .btn-outline {
+      background: transparent;
+      color: var(--off-white);
+      border: 1px solid var(--dark3);
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-outline:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    /* Avatar Upload */
+    .avatar-upload {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .avatar-preview {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop') center/cover;
+      border: 2px solid var(--gold);
+    }
+
+    /* Tags / Badges */
+    .tag-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.8rem;
+    }
+    .preference-tag {
+      background: var(--dark3);
+      color: var(--off-white);
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .tag-remove {
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .tag-remove:hover { color: var(--danger); }
+
+    /* Wallet specific */
+    .card-element {
+      background: var(--dark2);
+      border: 1px solid var(--dark3);
+      padding: 1rem;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-info {
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .card-icon {
+      background: #fff; color: #000; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem;
+    }
+
+    .badge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    .badge-card {
+      background: var(--dark2);
+      border: 1px solid var(--dark3);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .badge-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+      background: var(--gold);
+    }
+    .badge-icon {
+      font-size: 2.5rem; margin-bottom: 0.5rem;
+    }
+    .badge-title { font-weight: 700; margin-bottom: 0.2rem; }
+    .badge-artist { font-size: 0.85rem; color: var(--muted); }
+
+    @media (max-width: 768px) {
+      .settings-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .sidebar-nav { position: static; display: flex; overflow-x: auto; padding-bottom: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--dark3); }
+      .sidebar-link { white-space: nowrap; margin-bottom: 0; border-radius: 20px; border: 1px solid transparent; padding: 0.5rem 1rem;}
+      .sidebar-link.active { border: 1px solid var(--gold); border-left: 1px solid var(--gold); border-radius: 20px; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Nav -->
+  <nav class="top-nav">
+    <a href="/" class="logo">GROUNDFLOOR</a>
+    <div class="nav-links">
+      <a href="/feed">Feed</a>
+      <a href="/discovery">Discovery</a>
+      <a href="/profile" class="nav-avatar"></a>
+    </div>
+  </nav>
+
+  <div class="page-container">
+    <div class="page-header">
+      <h1 class="page-title">Supporter Profile</h1>
+    </div>
+
+    <div class="settings-grid">
+      <!-- Sidebar -->
+      <div class="sidebar-nav">
+        <a href="#account" class="sidebar-link active">Account Settings</a>
+        <a href="#artist-dashboard" class="sidebar-link">Artist Dashboard</a>
+        <a href="#preferences" class="sidebar-link">Music Preferences</a>
+        <a href="#wallet" class="sidebar-link">Wallet & Badges</a>
+        <a href="#security" class="sidebar-link">Security</a>
+      </div>
+
+      <!-- Main Content -->
+      <div class="settings-content">
+        
+        <!-- Account Settings -->
+        <div id="account" class="settings-section">
+          <h2 class="section-heading">Account Information</h2>
+          
+          <div class="avatar-upload">
+            <div class="avatar-preview"></div>
+            <div>
+              <button class="btn-outline" style="padding: 0.6rem 1rem; font-size: 0.9rem;">Change Avatar</button>
+              <div class="helper-text">JPG, GIF or PNG. Max size of 2MB.</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Username</label>
+              <input type="text" value="SarahM_99">
+              <div class="helper-text">This is how you appear on the Supporters Wall.</div>
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" value="sarah.m@example.com">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Short Bio</label>
+            <input type="text" value="Always looking for the next underground hit in LA.">
+          </div>
+
+          <button class="btn-primary">Save Changes</button>
+        </div>
+
+        <!-- Artist Dashboard -->
+        <div id="artist-dashboard" class="settings-section">
+          <h2 class="section-heading">Artist Dashboard</h2>
+          <p style="color: var(--muted); margin-bottom: 1.5rem; font-size: 0.95rem;">For artist accounts, this opens the private campaign cockpit: pledges, supporter reasons, listens, shares, claim status, and campaign proof.</p>
+          <button class="btn-primary" onclick="window.location.href='/operator'">Open Artist Dashboard</button>
+        </div>
+
+        <!-- Music Preferences -->
+        <div id="preferences" class="settings-section">
+          <h2 class="section-heading">Music Preferences</h2>
+          <p style="color: var(--muted); margin-bottom: 1.5rem; font-size: 0.95rem;">This helps us tailor the Discovery feed to campaigns you actually want to back.</p>
+
+          <div class="form-group">
+            <label>Favorite Genres</label>
+            <input type="text" placeholder="Type a genre and press Enter...">
+            <div class="tag-container">
+              <div class="preference-tag">Indie Rock <span class="tag-remove">✕</span></div>
+              <div class="preference-tag">Alternative R&B <span class="tag-remove">✕</span></div>
+              <div class="preference-tag">Shoegaze <span class="tag-remove">✕</span></div>
+              <div class="preference-tag">Garage Revival <span class="tag-remove">✕</span></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Favorite Artists (Already Established)</label>
+            <input type="text" placeholder="Type an artist and press Enter...">
+            <div class="tag-container">
+              <div class="preference-tag">Arctic Monkeys <span class="tag-remove">✕</span></div>
+              <div class="preference-tag">The Strokes <span class="tag-remove">✕</span></div>
+              <div class="preference-tag">Frank Ocean <span class="tag-remove">✕</span></div>
+            </div>
+            <div class="helper-text">We use these to match you with unsigned artists running lookalike audience ads.</div>
+          </div>
+
+          <button class="btn-primary">Update Preferences</button>
+        </div>
+
+        <!-- Wallet & Badges -->
+        <div id="wallet" class="settings-section">
+          <h2 class="section-heading">Wallet & Badges</h2>
+          
+          <div class="form-group" style="margin-bottom: 3rem;">
+            <label>Payment Methods</label>
+            <div class="card-element">
+              <div class="card-info">
+                <span class="card-icon">VISA</span>
+                <span>•••• •••• •••• 4242</span>
+                <span style="color: var(--muted); font-size: 0.9rem;">Expires 12/28</span>
+              </div>
+              <button class="btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; border-color: var(--danger); color: var(--danger);">Remove</button>
+            </div>
+            <button class="btn-outline" style="margin-top: 1rem; width: 100%;">+ Add Payment Method</button>
+          </div>
+
+          <label>Your Campaign Badges</label>
+          <div class="badge-grid">
+            <div class="badge-card">
+              <div class="badge-icon">🎧</div>
+              <div class="badge-title">Early Believer</div>
+              <div class="badge-artist">The Rare Occasions</div>
+              <div class="badge-meta" style="margin-top: 0.8rem; font-size: 0.75rem; color: var(--gold); border-top: 1px solid var(--dark3); padding-top: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                Supported at 3,500 listeners
+              </div>
+            </div>
+            <div class="badge-card" style="border-color: var(--gold);">
+              <div class="badge-icon">⚡️</div>
+              <div class="badge-title" style="color: var(--gold);">A&R Scout</div>
+              <div class="badge-artist">Jenevieve</div>
+              <div class="badge-meta" style="margin-top: 0.8rem; font-size: 0.75rem; color: var(--gold); border-top: 1px solid var(--dark3); padding-top: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                Supported at 12,400 listeners
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Security -->
+        <div id="security" class="settings-section">
+          <h2 class="section-heading">Security</h2>
+          <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" value="••••••••">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>New Password</label>
+              <input type="password" placeholder="Enter new password">
+            </div>
+            <div class="form-group">
+              <label>Confirm New Password</label>
+              <input type="password" placeholder="Confirm new password">
+            </div>
+          </div>
+          <button class="btn-primary">Update Password</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simple script to handle sidebar highlighting on scroll (visual only for mockup)
+    const links = document.querySelectorAll('.sidebar-link');
+    links.forEach(link => {
+      link.addEventListener('click', function(e) {
+        links.forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

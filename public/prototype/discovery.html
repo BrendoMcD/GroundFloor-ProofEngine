@@ -1,0 +1,894 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GroundFloor — Trending Artists</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=DM+Sans:wght@300;400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-dim: #7A5E23;
+    --off-white: #EDE8DF;
+    --muted: #7A7570;
+    --dark: #0A0906;
+    --dark2: #131109;
+    --dark3: #1C1A14;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { overflow-x: hidden; }
+  
+  body {
+    /* Modern musical background: deep radial spotlight over dark */
+    background: #0a0a0a url("/prototype/assets/sky_texture.jpg") repeat-y center top; background-size: 100% auto;
+    /* background-attachment: fixed; removed to let it scroll or animate if we want */
+    color: var(--off-white);
+    font-family: 'DM Sans', sans-serif;
+    padding: 2rem 3rem 5rem;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Nav */
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+
+  .nav-links { display: flex; gap: 1.5rem; }
+  .nav-links a { color: var(--off-white); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--gold); }
+  header { text-align: center; margin-bottom: 4rem; }
+  h1 { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; }
+  p.subtitle { color: var(--muted); margin-top: 0.5rem; font-size: 1.1rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: rgba(19, 17, 9, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--dark3);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+  }
+  .card:hover { 
+    transform: translateY(-4px); 
+    border-color: var(--gold-dim);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+
+  .art {
+    height: 200px;
+    background: linear-gradient(135deg, #222 0%, #111 100%);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--dark3);
+  }
+  .play-btn {
+    position: absolute;
+    width: 50px; height: 50px;
+    background: var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--dark);
+    font-size: 1.2rem;
+    padding-left: 4px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .play-btn:hover { transform: scale(1.1); box-shadow: 0 0 15px rgba(201, 168, 76, 0.4); }
+
+  .info { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; }
+  .genre { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--gold); margin-bottom: 0.5rem; font-weight: 700; }
+  .title { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.2rem; color: var(--off-white); }
+  .artist { color: var(--muted); font-size: 1rem; margin-bottom: 1.5rem; }
+
+  /* DSP Links */
+  .dsp-links {
+    display: flex; gap: 0.5rem; margin-bottom: 1.5rem;
+  }
+  .dsp-btn {
+    background: var(--dark3); color: var(--off-white);
+    border: 1px solid #333; border-radius: 6px;
+    padding: 0.4rem 0.8rem; font-size: 0.75rem; font-weight: 500;
+    cursor: pointer; transition: background 0.2s, border-color 0.2s;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .dsp-btn:hover { background: #222; border-color: var(--muted); }
+
+  /* Progress Bar */
+  .progress-container { margin-bottom: 1.5rem; }
+  .progress-stats { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--muted); }
+  .progress-stats strong { color: var(--off-white); font-weight: 700; }
+  .progress-bar { width: 100%; height: 6px; background: var(--dark3); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--gold); border-radius: 3px; }
+
+  /* Actions */
+  .actions {
+    z-index: 50;
+    position: relative;
+    pointer-events: auto; margin-top: auto; }
+  .btn-fund {
+    pointer-events: auto;
+    cursor: pointer;
+    width: 100%; 
+    background: transparent; 
+    color: var(--gold);
+    border: 1px solid var(--gold); 
+    border-radius: 6px; 
+    padding: 0.8rem;
+    font-weight: 700; font-size: 0.95rem; 
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-fund:hover { 
+    background: rgba(201, 168, 76, 0.1); 
+  }
+  .btn-fund:hover { opacity: 0.9; }
+
+
+  /* Desktop Checkout Modal */
+  .checkout-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+    z-index: 99999; display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  }
+  .checkout-overlay.active { opacity: 1; pointer-events: all; }
+  .desktop-checkout-modal {
+    width: 100%; max-width: 480px; background: var(--dark2); border: 1px solid var(--gold);
+    border-radius: 16px; padding: 2.5rem;
+    transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+  }
+  .checkout-overlay.active .desktop-checkout-modal { transform: scale(1); }
+  
+  .close-modal { 
+    position: absolute; top: 20px; right: 20px; background: none; 
+    border: none; color: var(--muted); font-size: 1.5rem; cursor: pointer;
+    transition: color 0.2s;
+  }
+  .close-modal:hover { color: var(--off-white); }
+  
+  .checkout-title { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; color: var(--gold); letter-spacing: 1px; margin-bottom: 0.5rem; }
+  .checkout-subtitle { color: var(--off-white); font-size: 1rem; margin-bottom: 2rem; opacity: 0.9; }
+  
+  .tier-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem; }
+  .tier-btn {
+    background: var(--dark3); border: 1px solid #333; color: var(--off-white);
+    padding: 1rem 0; border-radius: 8px; font-size: 1.2rem; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+  .tier-btn:hover { background: rgba(255,255,255,0.05); }
+  .tier-btn.selected { 
+    background: rgba(201,168,76,0.15); 
+    border-color: var(--gold); 
+    color: var(--gold); 
+  }
+  
+  .custom-input {
+    width: 100%; background: var(--dark3); border: 1px solid #333; color: var(--off-white);
+    padding: 1rem 1.2rem; border-radius: 8px; font-size: 1.1rem; font-family: 'DM Sans', sans-serif;
+    margin-bottom: 2rem; transition: border-color 0.2s;
+  }
+  .custom-input:focus { outline: none; border-color: var(--gold); }
+  
+  .pay-btn {
+    width: 100%; background: var(--off-white); color: #000; border: none;
+    padding: 1.2rem; border-radius: 8px; font-size: 1.1rem; font-weight: 700;
+    cursor: pointer; transition: opacity 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+  .pay-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .pay-btn:hover:not(:disabled) { opacity: 0.9; }
+  
+  .checkout-fineprint { text-align: center; font-size: 0.8rem; color: var(--muted); margin-top: 1.5rem; }
+
+  /* Search Bar */
+  .search-container {
+    max-width: 600px;
+    margin: 0 auto 1rem;
+    position: relative;
+  }
+  .search-input {
+    width: 100%;
+    background: rgba(19, 17, 9, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--dark3);
+    color: var(--off-white);
+    padding: 1rem 1.5rem 1rem 3rem;
+    border-radius: 30px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+  .search-input:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 15px rgba(201, 168, 76, 0.2);
+  }
+  .search-icon {
+    position: absolute;
+    left: 1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 1.2rem;
+  }
+
+  .discovery-actions {
+    max-width: 720px;
+    margin: 0 auto 3rem;
+    padding: 0 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+  }
+  .discovery-action-primary,
+  .discovery-action-secondary {
+    border-radius: 999px;
+    padding: 0.85rem 1.2rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.86rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: opacity 0.2s, border-color 0.2s, color 0.2s;
+    white-space: nowrap;
+  }
+  .discovery-action-primary {
+    background: var(--gold);
+    color: var(--dark);
+    border: 1px solid var(--gold);
+  }
+  .discovery-action-secondary {
+    background: rgba(19, 17, 9, 0.64);
+    color: var(--off-white);
+    border: 1px solid rgba(237,232,223,0.16);
+  }
+  .discovery-action-primary:hover,
+  .discovery-action-secondary:hover {
+    opacity: 0.9;
+    border-color: var(--gold);
+  }
+  .discovery-action-note {
+    flex-basis: 100%;
+    color: var(--muted);
+    font-size: 0.88rem;
+    text-align: center;
+  }
+  
+
+  /* Netflix Style Rows */
+  body {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  nav, header, .search-container {
+    padding-left: 3rem;
+    padding-right: 3rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .feed-section {
+    margin-bottom: 3rem;
+    width: 100%;
+  }
+  .section-header {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    color: var(--off-white);
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    padding-left: 3rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .row-container {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 1.5rem;
+    padding: 0 3rem 2rem 3rem;
+    scrollbar-width: none;
+    scroll-padding-left: 3rem; /* Tells the scroll-snap to leave 3rem of space on the left when snapping */
+  }
+  .row-container::-webkit-scrollbar {
+    display: none;
+  }
+  .row-container .card {
+    flex: 0 0 320px;
+    scroll-snap-align: start;
+    margin-bottom: 0;
+  }
+  @media (max-width: 768px) {
+    nav, header, .search-container, .discovery-actions, .section-header { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .row-container { padding: 0 1.5rem 2rem 1.5rem; }
+    .row-container .card { flex: 0 0 280px; }
+    .discovery-action-primary,
+    .discovery-action-secondary { width: 100%; text-align: center; }
+  }
+
+  /* Hide Button Default, Show on Hover */
+  .card .actions { z-index: 50; position: relative; pointer-events: auto; margin-top: auto; padding-top: 1rem; }
+  
+  
+
+  /* Scroller Arrows */
+  .row-wrapper {
+    position: relative;
+  }
+  .scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px; height: 40px;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    z-index: 100;
+    font-size: 1.2rem;
+    transition: all 0.2s;
+    backdrop-filter: blur(5px);
+  }
+  .scroll-btn:hover { background: var(--gold); color: var(--dark); }
+  .scroll-left { left: 1rem; }
+  .scroll-right { right: 1rem; }
+  @media (max-width: 768px) {
+    .scroll-btn { display: none; } /* Hide arrows on mobile where swipe is natural */
+    .card .actions { opacity: 1; position: static; transform: none; background: none; padding-top: 1rem; padding-bottom: 0;}
+    .card .info { padding-bottom: 1.5rem; }
+  }
+
+  
+  
+
+  .row-container .card:first-child {
+    margin-left: max(3rem, calc((100vw - 1200px) / 2 + 3rem));
+  }
+  .row-container .card:last-child {
+    margin-right: max(3rem, calc((100vw - 1200px) / 2 + 3rem));
+  }
+  .row-container {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  @media (max-width: 768px) {
+    .row-container .card:first-child { margin-left: 1.5rem; }
+    .row-container .card:last-child { margin-right: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo" style="text-decoration: none;">GroundFloor</a>
+  <div class="nav-links">
+    <a href="/discovery" style="color: var(--gold);">Discover</a>
+    <a href="/feed">Feed</a>
+    <a href="/create">Create Page</a>
+    <a href="/signin">Sign In</a>
+  </div>
+</nav>
+
+<header>
+  <h1>Discover</h1>
+  <p class="subtitle">Find the next breakout artist.</p>
+</header>
+
+  <div class="search-container">
+    <span class="search-icon">🔍</span>
+    <input type="text" class="search-input" placeholder="Search for artists, songs, or genres...">
+  </div>
+  <div class="discovery-actions">
+    <a class="discovery-action-primary" href="/create">Nominate an Artist</a>
+    <a class="discovery-action-secondary" href="/create">Create Artist Page</a>
+    <div class="discovery-action-note">Can’t find them yet? Start the page and invite the artist to claim it.</div>
+  </div>
+  
+
+<div id="netflix-rows"><div class="feed-section"><h2 class="section-header">Top 20 Trending</h2><div class="row-wrapper"><button class="scroll-btn scroll-left" onclick="document.getElementById('row-0').scrollBy({left: -320, behavior: 'smooth'})">‹</button><div class="row-container" id="row-0"><div class="card">
+    <div class="art">
+      <div class="play-btn">▶</div>
+    </div>
+    <div class="info">
+      <div class="genre">Indie Pop</div>
+      <div class="title">Midnight Static</div>
+      <a href="/artist/the-rare-occasions" style="text-decoration: none;"><div class="artist" style="cursor: pointer; color: var(--gold); transition: color 0.2s;" onmouseover="this.style.color='var(--off-white)'" onmouseout="this.style.color='var(--gold)'">by The Rare Occasions</div></a>
+      
+      <div class="dsp-links">
+        <button class="dsp-btn">+ Spotify</button>
+        <button class="dsp-btn">+ Apple Music</button>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-stats">
+          <span><strong>$195</strong> raised</span>
+          <span>$300 Goal</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 65%;"></div></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-fund" onclick="window.location.href='/artist/the-rare-occasions'">View Campaign</button>
+      </div>
+    </div>
+  </div><div class="card">
+    <div class="art">
+      <div class="play-btn">▶</div>
+    </div>
+    <div class="info">
+      <div class="genre">Alt R&amp;B</div>
+      <div class="title">Glass Heavens</div>
+      <a href="/artist/the-rare-occasions" style="text-decoration: none;"><div class="artist" style="cursor: pointer; color: var(--gold); transition: color 0.2s;" onmouseover="this.style.color='var(--off-white)'" onmouseout="this.style.color='var(--gold)'">by Jenevieve</div></a>
+      
+      <div class="dsp-links">
+        <button class="dsp-btn">+ Spotify</button>
+        <button class="dsp-btn">+ Apple Music</button>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-stats">
+          <span><strong>$45</strong> raised</span>
+          <span>$250 Goal</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 18%;"></div></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-fund" onclick="window.location.href='/artist/the-rare-occasions'">View Campaign</button>
+      </div>
+    </div>
+  </div><div class="card">
+    <div class="art">
+      <div class="play-btn">▶</div>
+    </div>
+    <div class="info">
+      <div class="genre">Post-Punk</div>
+      <div class="title">Static Age</div>
+      <a href="/artist/the-rare-occasions" style="text-decoration: none;"><div class="artist" style="cursor: pointer; color: var(--gold); transition: color 0.2s;" onmouseover="this.style.color='var(--off-white)'" onmouseout="this.style.color='var(--gold)'">by Fontaines D.C.</div></a>
+      
+      <div class="dsp-links">
+        <button class="dsp-btn">+ Spotify</button>
+        <button class="dsp-btn">+ Apple Music</button>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-stats">
+          <span><strong>$280</strong> raised</span>
+          <span>$300 Goal</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 93%;"></div></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-fund" onclick="window.location.href='/artist/the-rare-occasions'">View Campaign</button>
+      </div>
+    </div>
+  </div><div class="card">
+    <div class="art">
+      <div class="play-btn">▶</div>
+    </div>
+    <div class="info">
+      <div class="genre">Indie Pop</div>
+      <div class="title">Midnight Static</div>
+      <a href="/artist/the-rare-occasions" style="text-decoration: none;"><div class="artist" style="cursor: pointer; color: var(--gold); transition: color 0.2s;" onmouseover="this.style.color='var(--off-white)'" onmouseout="this.style.color='var(--gold)'">by The Rare Occasions</div></a>
+      
+      <div class="dsp-links">
+        <button class="dsp-btn">+ Spotify</button>
+        <button class="dsp-btn">+ Apple Music</button>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-stats">
+          <span><strong>$195</strong> raised</span>
+          <span>$300 Goal</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 65%;"></div></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-fund" onclick="window.location.href='/artist/the-rare-occasions'">View Campaign</button>
+      </div>
+    </div>
+  </div><div class="card">
+    <div class="art">
+      <div class="play-btn">▶</div>
+    </div>
+    <div class="info">
+      <div class="genre">Alt R&amp;B</div>
+      <div class="title">Glass Heavens</div>
+      <a href="/artist/the-rare-occasions" style="text-decoration: none;"><div class="artist" style="cursor: pointer; color: var(--gold); transition: color 0.2s;" onmouseover="this.style.color='var(--off-white)'" onmouseout="this.style.color='var(--gold)'">by Jenevieve</div></a>
+      
+      <div class="dsp-links">
+        <button class="dsp-btn">+ Spotify</button>
+        <button class="dsp-btn">+ Apple Music</button>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-stats">
+          <span><strong>$45</strong> raised</span>
+          <span>$250 Goal</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 18%;"></div></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-fund" onclick="window.location.href='/artist/the-rare-occasions'">View Campaign</button>
+      </div>
+    </div>
+  </div><div class="card">
+    <div class="art">
+      <div class="play-btn">▶</div>
+    </div>
+    <div class="info">
+      <div class="genre">Post-Punk</div>
+      <div class="title">Static Age</div>
+      <a href="/artist/the-rare-occasions" style="text-decoration: none;"><div class="artist" style="cursor: pointer; color: var(--gold); transition: color 0.2s;" onmouseover="this.style.color='var(--off-white)'" onmouseout="this.style.color='var(--gold)'">by Fontaines D.C.</div></a>
+      
+      <div class="dsp-links">
+        <button class="dsp-btn">+ Spotify</button>
+        <button class="dsp-btn">+ Apple Music</button>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-stats">
+          <span><strong>$280</strong> raised</span>
+          <span>$300 Goal</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 93%;"></div></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-fund" onclick="window.location.href='/artist/the-rare-occasions'">View Campaign</button>
+      </div>
+    </div>
+  </div></div><button class="scroll-btn scroll-right" onclick="document.getElementById('row-0').scrollBy({left: 320, behavior: 'smooth'})">›</button></div></div><div class="feed-section"><h2 class="section-header">We Think You'd Like</h2><div class="row-wrapper"><button class="scroll-btn scroll-left" onclick="document.getElementById('row-1').scrollBy({left: -320, behavior: 'smooth'})">‹</button><div class="row-container" id="row-1"><div class="card">
+    <div class="art">
+      <div class="play-btn">▶</div>
+    </div>
+    <div class="info">
+      <div class="genre">Post-Punk</div>
+      <div class="title">Static Age</div>
+      <a href="/artist/the-rare-occasions" style="text-decoration: none;"><div class="artist" style="cursor: pointer; color: var(--gold); transition: color 0.2s;" onmouseover="this.style.color='var(--off-white)'" onmouseout="this.style.color='var(--gold)'">by Fontaines D.C.</div></a>
+      
+      <div class="dsp-links">
+        <button class="dsp-btn">+ Spotify</button>
+        <button class="dsp-btn">+ Apple Music</button>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-stats">
+          <span><strong>$280</strong> raised</span>
+          <span>$300 Goal</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 93%;"></div></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-fund" onclick="window.location.href='/artist/the-rare-occasions'">View Campaign</button>
+      </div>
+    </div>
+  </div><div class="card">
+    <div class="art">
+      <div class="play-btn">▶</div>
+    </div>
+    <div class="info">
+      <div class="genre">Alt R&amp;B</div>
+      <div class="title">Glass Heavens</div>
+      <a href="/artist/the-rare-occasions" style="text-decoration: none;"><div class="artist" style="cursor: pointer; color: var(--gold); transition: color 0.2s;" onmouseover="this.style.color='var(--off-white)'" onmouseout="this.style.color='var(--gold)'">by Jenevieve</div></a>
+      
+      <div class="dsp-links">
+        <button class="dsp-btn">+ Spotify</button>
+        <button class="dsp-btn">+ Apple Music</button>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-stats">
+          <span><strong>$45</strong> raised</span>
+          <span>$250 Goal</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 18%;"></div></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-fund" onclick="window.location.href='/artist/the-rare-occasions'">View Campaign</button>
+      </div>
+    </div>
+  </div><div class="card">
+    <div class="art">
+      <div class="play-btn">▶</div>
+    </div>
+    <div class="info">
+      <div class="genre">Indie Pop</div>
+      <div class="title">Midnight Static</div>
+      <a href="/artist/the-rare-occasions" style="text-decoration: none;"><div class="artist" style="cursor: pointer; color: var(--gold); transition: color 0.2s;" onmouseover="this.style.color='var(--off-white)'" onmouseout="this.style.color='var(--gold)'">by The Rare Occasions</div></a>
+      
+      <div class="dsp-links">
+        <button class="dsp-btn">+ Spotify</button>
+        <button class="dsp-btn">+ Apple Music</button>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-stats">
+          <span><strong>$195</strong> raised</span>
+          <span>$300 Goal</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 65%;"></div></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-fund" onclick="window.location.href='/artist/the-rare-occasions'">View Campaign</button>
+      </div>
+    </div>
+  </div><div class="card">
+    <div class="art">
+      <div class="play-btn">▶</div>
+    </div>
+    <div class="info">
+      <div class="genre">Post-Punk</div>
+      <div class="title">Static Age</div>
+      <a href="/artist/the-rare-occasions" style="text-decoration: none;"><div class="artist" style="cursor: pointer; color: var(--gold); transition: color 0.2s;" onmouseover="this.style.color='var(--off-white)'" onmouseout="this.style.color='var(--gold)'">by Fontaines D.C.</div></a>
+      
+      <div class="dsp-links">
+        <button class="dsp-btn">+ Spotify</button>
+        <button class="dsp-btn">+ Apple Music</button>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-stats">
+          <span><strong>$280</strong> raised</span>
+          <span>$300 Goal</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 93%;"></div></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-fund" onclick="window.location.href='/artist/the-rare-occasions'">View Campaign</button>
+      </div>
+    </div>
+  </div><div class="card">
+    <div class="art">
+      <div class="play-btn">▶</div>
+    </div>
+    <div class="info">
+      <div class="genre">Alt R&amp;B</div>
+      <div class="title">Glass Heavens</div>
+      <a href="/artist/the-rare-occasions" style="text-decoration: none;"><div class="artist" style="cursor: pointer; color: var(--gold); transition: color 0.2s;" onmouseover="this.style.color='var(--off-white)'" onmouseout="this.style.color='var(--gold)'">by Jenevieve</div></a>
+      
+      <div class="dsp-links">
+        <button class="dsp-btn">+ Spotify</button>
+        <button class="dsp-btn">+ Apple Music</button>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-stats">
+          <span><strong>$45</strong> raised</span>
+          <span>$250 Goal</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 18%;"></div></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-fund" onclick="window.location.href='/artist/the-rare-occasions'">View Campaign</button>
+      </div>
+    </div>
+  </div></div><button class="scroll-btn scroll-right" onclick="document.getElementById('row-1').scrollBy({left: 320, behavior: 'smooth'})">›</button></div></div><div class="feed-section"><h2 class="section-header">Rising in R&amp;B</h2><div class="row-wrapper"><button class="scroll-btn scroll-left" onclick="document.getElementById('row-2').scrollBy({left: -320, behavior: 'smooth'})">‹</button><div class="row-container" id="row-2"><div class="card">
+    <div class="art">
+      <div class="play-btn">▶</div>
+    </div>
+    <div class="info">
+      <div class="genre">Alt R&amp;B</div>
+      <div class="title">Glass Heavens</div>
+      <a href="/artist/the-rare-occasions" style="text-decoration: none;"><div class="artist" style="cursor: pointer; color: var(--gold); transition: color 0.2s;" onmouseover="this.style.color='var(--off-white)'" onmouseout="this.style.color='var(--gold)'">by Jenevieve</div></a>
+      
+      <div class="dsp-links">
+        <button class="dsp-btn">+ Spotify</button>
+        <button class="dsp-btn">+ Apple Music</button>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-stats">
+          <span><strong>$45</strong> raised</span>
+          <span>$250 Goal</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 18%;"></div></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-fund" onclick="window.location.href='/artist/the-rare-occasions'">View Campaign</button>
+      </div>
+    </div>
+  </div><div class="card">
+    <div class="art">
+      <div class="play-btn">▶</div>
+    </div>
+    <div class="info">
+      <div class="genre">Alt R&amp;B</div>
+      <div class="title">Glass Heavens</div>
+      <a href="/artist/the-rare-occasions" style="text-decoration: none;"><div class="artist" style="cursor: pointer; color: var(--gold); transition: color 0.2s;" onmouseover="this.style.color='var(--off-white)'" onmouseout="this.style.color='var(--gold)'">by Jenevieve</div></a>
+      
+      <div class="dsp-links">
+        <button class="dsp-btn">+ Spotify</button>
+        <button class="dsp-btn">+ Apple Music</button>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-stats">
+          <span><strong>$45</strong> raised</span>
+          <span>$250 Goal</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 18%;"></div></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-fund" onclick="window.location.href='/artist/the-rare-occasions'">View Campaign</button>
+      </div>
+    </div>
+  </div><div class="card">
+    <div class="art">
+      <div class="play-btn">▶</div>
+    </div>
+    <div class="info">
+      <div class="genre">Post-Punk</div>
+      <div class="title">Static Age</div>
+      <a href="/artist/the-rare-occasions" style="text-decoration: none;"><div class="artist" style="cursor: pointer; color: var(--gold); transition: color 0.2s;" onmouseover="this.style.color='var(--off-white)'" onmouseout="this.style.color='var(--gold)'">by Fontaines D.C.</div></a>
+      
+      <div class="dsp-links">
+        <button class="dsp-btn">+ Spotify</button>
+        <button class="dsp-btn">+ Apple Music</button>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-stats">
+          <span><strong>$280</strong> raised</span>
+          <span>$300 Goal</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 93%;"></div></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-fund" onclick="window.location.href='/artist/the-rare-occasions'">View Campaign</button>
+      </div>
+    </div>
+  </div><div class="card">
+    <div class="art">
+      <div class="play-btn">▶</div>
+    </div>
+    <div class="info">
+      <div class="genre">Indie Pop</div>
+      <div class="title">Midnight Static</div>
+      <a href="/artist/the-rare-occasions" style="text-decoration: none;"><div class="artist" style="cursor: pointer; color: var(--gold); transition: color 0.2s;" onmouseover="this.style.color='var(--off-white)'" onmouseout="this.style.color='var(--gold)'">by The Rare Occasions</div></a>
+      
+      <div class="dsp-links">
+        <button class="dsp-btn">+ Spotify</button>
+        <button class="dsp-btn">+ Apple Music</button>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-stats">
+          <span><strong>$195</strong> raised</span>
+          <span>$300 Goal</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 65%;"></div></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-fund" onclick="window.location.href='/artist/the-rare-occasions'">View Campaign</button>
+      </div>
+    </div>
+  </div><div class="card">
+    <div class="art">
+      <div class="play-btn">▶</div>
+    </div>
+    <div class="info">
+      <div class="genre">Post-Punk</div>
+      <div class="title">Static Age</div>
+      <a href="/artist/the-rare-occasions" style="text-decoration: none;"><div class="artist" style="cursor: pointer; color: var(--gold); transition: color 0.2s;" onmouseover="this.style.color='var(--off-white)'" onmouseout="this.style.color='var(--gold)'">by Fontaines D.C.</div></a>
+      
+      <div class="dsp-links">
+        <button class="dsp-btn">+ Spotify</button>
+        <button class="dsp-btn">+ Apple Music</button>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-stats">
+          <span><strong>$280</strong> raised</span>
+          <span>$300 Goal</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 93%;"></div></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-fund" onclick="window.location.href='/artist/the-rare-occasions'">View Campaign</button>
+      </div>
+    </div>
+  </div></div><button class="scroll-btn scroll-right" onclick="document.getElementById('row-2').scrollBy({left: 320, behavior: 'smooth'})">›</button></div></div></div>
+
+
+<!-- Desktop Checkout Modal -->
+<div class="checkout-overlay" id="checkoutOverlay" onclick="if(event.target===this) closeCheckout()">
+  <div class="desktop-checkout-modal">
+    <button class="close-modal" onclick="closeCheckout()">✕</button>
+    <h3 class="checkout-title">Support <span id="checkoutArtistName">Artist</span></h3>
+    <p class="checkout-subtitle">Pool your funds. Trigger the ad buy. Get the Early Believer badge.</p>
+    
+    <div class="tier-grid">
+      <button class="tier-btn" onclick="selectTier(5, this)">$5</button>
+      <button class="tier-btn" onclick="selectTier(10, this)">$10</button>
+      <button class="tier-btn" onclick="selectTier(25, this)">$25</button>
+    </div>
+    
+    <input type="number" class="custom-input" id="customAmount" placeholder="Custom amount" oninput="customInput(this)">
+    
+    <button class="pay-btn" id="payBtn" disabled="">Select an amount</button>
+    <p class="checkout-fineprint">Secured by Stripe. Instant access to updates and badges.</p>
+  </div>
+</div>
+
+<script>
+  function openCheckout(artistName) {
+    document.getElementById('checkoutArtistName').innerText = artistName;
+    document.getElementById('checkoutOverlay').classList.add('active');
+    
+    document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('customAmount').value = '';
+    const payBtn = document.getElementById('payBtn');
+    payBtn.disabled = true;
+    payBtn.innerHTML = 'Select an amount';
+  }
+  
+  function closeCheckout() {
+    document.getElementById('checkoutOverlay').classList.remove('active');
+  }
+  
+  function customInput(input) {
+    document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('selected'));
+    const payBtn = document.getElementById('payBtn');
+    if (input.value && Number(input.value) > 0) {
+      payBtn.disabled = false;
+      payBtn.innerHTML = 'Checkout with Stripe - $' + input.value;
+    } else {
+      payBtn.disabled = true;
+      payBtn.innerHTML = 'Select an amount';
+    }
+  }
+  
+  function selectTier(amount, btnElement) {
+    document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('selected'));
+    btnElement.classList.add('selected');
+    document.getElementById('customAmount').value = '';
+    
+    const payBtn = document.getElementById('payBtn');
+    payBtn.disabled = false;
+    payBtn.innerHTML = 'Checkout with Stripe - $' + amount;
+  }
+</script>
+
+</body></html>
