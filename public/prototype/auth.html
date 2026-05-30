@@ -221,6 +221,17 @@
     .toggle-text { text-align: center; margin-top: 2rem; font-size: 0.95rem; color: var(--muted); }
     .toggle-link { color: var(--gold); text-decoration: none; font-weight: 700; cursor: pointer; transition: color 0.2s; }
     .toggle-link:hover { color: var(--off-white); }
+    .auth-note {
+      background: rgba(201, 168, 76, 0.1);
+      border: 1px solid rgba(201, 168, 76, 0.25);
+      border-radius: 10px;
+      color: var(--off-white);
+      display: none;
+      font-size: 0.86rem;
+      line-height: 1.45;
+      margin-bottom: 1.4rem;
+      padding: 0.9rem 1rem;
+    }
 
     @media (max-width: 900px) {
       .site-nav {
@@ -315,6 +326,8 @@
         <p class="subtitle" id="formSubtitle">Welcome back. Let's break some records.</p>
       </div>
 
+      <div class="auth-note" id="authNote"></div>
+
       <div class="social-login">
 
         <button class="social-btn">
@@ -330,20 +343,20 @@
 
       <div class="divider"><span>or</span></div>
 
-      <form action="/create">
+      <form id="authForm">
         <div class="input-group" id="usernameGroup" style="display: none;">
           <label>Username</label>
-          <input type="text" placeholder="How you'll appear on supporter walls">
+          <input id="usernameInput" type="text" placeholder="How you'll appear on supporter walls">
         </div>
         
         <div class="input-group">
           <label>Email</label>
-          <input type="email" placeholder="you@example.com" required>
+          <input id="emailInput" type="email" placeholder="you@example.com" required>
         </div>
         
         <div class="input-group">
           <label>Password</label>
-          <input type="password" placeholder="••••••••" required>
+          <input id="passwordInput" type="password" placeholder="••••••••" required>
         </div>
 
         <button type="submit" class="submit-btn" id="submitBtn">Sign In</button>
@@ -358,14 +371,50 @@
   </div>
 
   <script>
+    const ACCOUNT_KEY = 'groundfloor_current_user';
+    const ACCOUNTS_KEY = 'groundfloor_accounts';
     let isSignUp = false;
 
-    function toggleAuthMode() {
-      isSignUp = !isSignUp;
-      
+    function getAccounts() {
+      try {
+        return JSON.parse(window.localStorage.getItem(ACCOUNTS_KEY) || '[]');
+      } catch {
+        return [];
+      }
+    }
+
+    function saveAccount(account) {
+      const accounts = getAccounts();
+      const index = accounts.findIndex(item => item.email === account.email);
+      const nextAccount = { ...account, updatedAt: Date.now() };
+
+      if (index >= 0) {
+        accounts[index] = { ...accounts[index], ...nextAccount };
+      } else {
+        accounts.push({ ...nextAccount, createdAt: Date.now() });
+      }
+
+      window.localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+      window.localStorage.setItem(ACCOUNT_KEY, JSON.stringify(nextAccount));
+    }
+
+    function emailToUsername(email) {
+      return email.split('@')[0].replace(/[^a-z0-9_]/gi, '_') || 'groundfloor_user';
+    }
+
+    function setAuthNote(message) {
+      const note = document.getElementById('authNote');
+      note.innerText = message;
+      note.style.display = 'block';
+    }
+
+    function setAuthMode(signUp) {
+      isSignUp = signUp;
+
       const title = document.getElementById('formTitle');
       const subtitle = document.getElementById('formSubtitle');
       const usernameGroup = document.getElementById('usernameGroup');
+      const usernameInput = document.getElementById('usernameInput');
       const submitBtn = document.getElementById('submitBtn');
       const togglePrompt = document.getElementById('togglePrompt');
       const toggleLink = document.querySelector('.toggle-link');
@@ -374,6 +423,7 @@
         title.innerText = 'Create Account';
         subtitle.innerText = 'Join the ground floor of the next big thing.';
         usernameGroup.style.display = 'block';
+        usernameInput.required = true;
         submitBtn.innerText = 'Create Account';
         togglePrompt.innerText = 'Already have an account?';
         toggleLink.innerText = 'Sign in';
@@ -381,10 +431,80 @@
         title.innerText = 'Sign In';
         subtitle.innerText = 'Welcome back. Let\'s break some records.';
         usernameGroup.style.display = 'none';
+        usernameInput.required = false;
         submitBtn.innerText = 'Sign In';
         togglePrompt.innerText = 'Don\'t have an account?';
         toggleLink.innerText = 'Create one';
       }
+    }
+
+    function toggleAuthMode() {
+      setAuthMode(!isSignUp);
+      document.getElementById('authNote').style.display = 'none';
+    }
+
+    function createSocialAccount(provider) {
+      const normalizedProvider = provider.toLowerCase().replace(/\s+/g, '-');
+      const email = `${normalizedProvider}@groundfloor.demo`;
+
+      saveAccount({
+        username: `${provider} Fan`,
+        email,
+        bio: 'Finding artists before the rest of the room catches up.',
+        role: 'supporter',
+        provider
+      });
+
+      window.location.href = '/profile';
+    }
+
+    document.querySelectorAll('.social-btn').forEach((button) => {
+      button.addEventListener('click', () => {
+        const provider = button.innerText.replace('Continue with', '').trim();
+        createSocialAccount(provider);
+      });
+    });
+
+    document.getElementById('authForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const email = document.getElementById('emailInput').value.trim().toLowerCase();
+      const username = document.getElementById('usernameInput').value.trim();
+      const accounts = getAccounts();
+      const existingAccount = accounts.find(account => account.email === email);
+
+      if (!email) {
+        setAuthNote('Add an email so GroundFloor can attach badges, pledges, and artist pages to your account.');
+        return;
+      }
+
+      if (isSignUp) {
+        saveAccount({
+          username: username || emailToUsername(email),
+          email,
+          bio: 'New to GroundFloor. Looking for the next early-believer moment.',
+          role: 'supporter',
+          provider: 'email'
+        });
+        window.location.href = '/profile';
+        return;
+      }
+
+      saveAccount(existingAccount || {
+        username: emailToUsername(email),
+        email,
+        bio: 'Back on GroundFloor.',
+        role: 'supporter',
+        provider: 'email'
+      });
+      window.location.href = '/profile';
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('mode') === 'signup') {
+      setAuthMode(true);
+    } else {
+      setAuthMode(false);
     }
   </script>
 </body>

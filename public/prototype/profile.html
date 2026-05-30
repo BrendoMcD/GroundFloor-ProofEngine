@@ -221,6 +221,39 @@
       color: var(--gold);
     }
 
+    .account-status {
+      background: rgba(201, 168, 76, 0.09);
+      border: 1px solid rgba(201, 168, 76, 0.22);
+      border-radius: 12px;
+      color: var(--off-white);
+      display: flex;
+      gap: 1rem;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      padding: 1rem;
+    }
+    .account-status strong {
+      color: var(--gold);
+      display: block;
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.25rem;
+      text-transform: uppercase;
+    }
+    .account-status p {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.45;
+      margin: 0;
+    }
+    .account-actions {
+      align-items: flex-start;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      justify-content: flex-end;
+    }
+
     /* Avatar Upload */
     .avatar-upload {
       display: flex;
@@ -373,6 +406,12 @@
       .settings-section {
         margin-bottom: 3rem;
       }
+      .account-status {
+        flex-direction: column;
+      }
+      .account-actions {
+        justify-content: flex-start;
+      }
       .section-heading {
         font-size: 1.85rem;
         line-height: 1;
@@ -431,11 +470,22 @@
         <!-- Account Settings -->
         <div id="account" class="settings-section">
           <h2 class="section-heading">Account Information</h2>
+
+          <div class="account-status" id="accountStatus">
+            <div>
+              <strong id="accountStatusLabel">Demo account</strong>
+              <p id="accountStatusText">Sign up or sign in to attach badges, pledges, and created artist pages to your GroundFloor profile.</p>
+            </div>
+            <div class="account-actions">
+              <button class="btn-outline" id="signinBtn" type="button" onclick="window.location.href='/signin?mode=signup'" style="padding: 0.65rem 0.9rem; font-size: 0.85rem;">Sign Up</button>
+              <button class="btn-outline" id="signoutBtn" type="button" style="display: none; padding: 0.65rem 0.9rem; font-size: 0.85rem;">Sign Out</button>
+            </div>
+          </div>
           
           <div class="avatar-upload">
             <div class="avatar-preview"></div>
             <div>
-              <button class="btn-outline" style="padding: 0.6rem 1rem; font-size: 0.9rem;">Change Avatar</button>
+              <button class="btn-outline" type="button" style="padding: 0.6rem 1rem; font-size: 0.9rem;">Change Avatar</button>
               <div class="helper-text">JPG, GIF or PNG. Max size of 2MB.</div>
             </div>
           </div>
@@ -443,21 +493,22 @@
           <div class="form-row">
             <div class="form-group">
               <label>Username</label>
-              <input type="text" value="SarahM_99">
+              <input id="usernameInput" type="text" value="SarahM_99">
               <div class="helper-text">This is how you appear on the Supporters Wall.</div>
             </div>
             <div class="form-group">
               <label>Email Address</label>
-              <input type="email" value="sarah.m@example.com">
+              <input id="emailInput" type="email" value="sarah.m@example.com">
             </div>
           </div>
           
           <div class="form-group">
             <label>Short Bio</label>
-            <input type="text" value="Always looking for the next underground hit in LA.">
+            <input id="bioInput" type="text" value="Always looking for the next underground hit in LA.">
           </div>
 
-          <button class="btn-primary">Save Changes</button>
+          <button class="btn-primary" id="saveAccountBtn" type="button">Save Changes</button>
+          <div class="helper-text" id="accountSaveNote" style="display: none; color: var(--gold); margin-top: 0.75rem;">Account saved for this prototype session.</div>
         </div>
 
         <!-- Artist Dashboard -->
@@ -560,6 +611,66 @@
   </div>
 
   <script>
+    const ACCOUNT_KEY = 'groundfloor_current_user';
+    const ACCOUNTS_KEY = 'groundfloor_accounts';
+
+    function fallbackAccount() {
+      return {
+        username: 'SarahM_99',
+        email: 'sarah.m@example.com',
+        bio: 'Always looking for the next underground hit in LA.',
+        role: 'supporter',
+        demo: true
+      };
+    }
+
+    function getCurrentAccount() {
+      try {
+        return JSON.parse(window.localStorage.getItem(ACCOUNT_KEY)) || fallbackAccount();
+      } catch {
+        return fallbackAccount();
+      }
+    }
+
+    function getAccounts() {
+      try {
+        return JSON.parse(window.localStorage.getItem(ACCOUNTS_KEY) || '[]');
+      } catch {
+        return [];
+      }
+    }
+
+    function saveCurrentAccount(account) {
+      const nextAccount = { ...account, demo: false, updatedAt: Date.now() };
+      const accounts = getAccounts();
+      const index = accounts.findIndex(item => item.email === nextAccount.email);
+
+      if (index >= 0) {
+        accounts[index] = { ...accounts[index], ...nextAccount };
+      } else {
+        accounts.push({ ...nextAccount, createdAt: Date.now() });
+      }
+
+      window.localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+      window.localStorage.setItem(ACCOUNT_KEY, JSON.stringify(nextAccount));
+      renderAccount(nextAccount);
+    }
+
+    function renderAccount(account) {
+      document.getElementById('usernameInput').value = account.username || '';
+      document.getElementById('emailInput').value = account.email || '';
+      document.getElementById('bioInput').value = account.bio || '';
+
+      const isDemo = account.demo || !window.localStorage.getItem(ACCOUNT_KEY);
+      document.getElementById('accountStatusLabel').innerText = isDemo ? 'Demo account' : 'Signed in';
+      document.getElementById('accountStatusText').innerText = isDemo
+        ? 'Sign up or sign in to attach badges, pledges, and created artist pages to your GroundFloor profile.'
+        : `${account.username || 'Your account'} is connected. Future pledges, badges, nominations, and artist pages can attach here.`;
+
+      document.getElementById('signinBtn').style.display = isDemo ? 'inline-flex' : 'none';
+      document.getElementById('signoutBtn').style.display = isDemo ? 'none' : 'inline-flex';
+    }
+
     // Simple script to handle sidebar highlighting on scroll (visual only for mockup)
     const links = document.querySelectorAll('.sidebar-link');
     links.forEach(link => {
@@ -568,6 +679,33 @@
         this.classList.add('active');
       });
     });
+
+    document.getElementById('saveAccountBtn').addEventListener('click', () => {
+      const current = getCurrentAccount();
+      const username = document.getElementById('usernameInput').value.trim() || 'groundfloor_user';
+      const email = document.getElementById('emailInput').value.trim().toLowerCase() || current.email;
+      const bio = document.getElementById('bioInput').value.trim();
+      const saveNote = document.getElementById('accountSaveNote');
+
+      saveCurrentAccount({
+        ...current,
+        username,
+        email,
+        bio,
+        role: current.role || 'supporter'
+      });
+      saveNote.style.display = 'block';
+      window.setTimeout(() => {
+        saveNote.style.display = 'none';
+      }, 2600);
+    });
+
+    document.getElementById('signoutBtn').addEventListener('click', () => {
+      window.localStorage.removeItem(ACCOUNT_KEY);
+      renderAccount(fallbackAccount());
+    });
+
+    renderAccount(getCurrentAccount());
   </script>
 </body>
 </html>
