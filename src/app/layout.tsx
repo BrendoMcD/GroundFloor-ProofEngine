@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GroundFloor Proof Engine",
-  description: "A mobile-first MVP for testing artist support, badges, proof, and sharing.",
+  title: "GroundFloor",
+  description: "Fan-funded music promotion for unsigned and underground artists.",
 };
 
 export default function RootLayout({

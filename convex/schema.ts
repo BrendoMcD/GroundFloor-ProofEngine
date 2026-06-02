@@ -2,6 +2,34 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  // PHASE 1 WAITLIST / VALIDATION
+  waitlistEntries: defineTable({
+    email: v.string(),
+    role: v.union(
+      v.literal("fan"),
+      v.literal("artist"),
+      v.literal("producer"),
+      v.literal("manager"),
+      v.literal("industry"),
+      v.literal("other"),
+    ),
+    pledgeIntent: v.union(
+      v.literal("5"),
+      v.literal("10"),
+      v.literal("25"),
+      v.literal("50"),
+      v.literal("custom"),
+      v.literal("not_sure"),
+    ),
+    customPledgeAmount: v.optional(v.string()),
+    artistOrProject: v.optional(v.string()),
+    whatTheyWant: v.string(),
+    whatToAvoid: v.string(),
+    source: v.string(),
+    userAgent: v.optional(v.string()),
+    createdAt: v.number(),
+  }).index("by_email", ["email"]).index("by_createdAt", ["createdAt"]),
+
   // FANS & ARTISTS
   users: defineTable({
     name: v.string(),

@@ -1,4 +1,4 @@
-import { GroundFloorApp } from "../../page";
+import { GroundFloorApp } from "../../proof/page";
 
 type ArtistRouteProps = {
   params: Promise<{
