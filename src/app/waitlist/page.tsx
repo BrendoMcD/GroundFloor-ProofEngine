@@ -271,22 +271,34 @@ export default function WaitlistPage() {
             <aside className="rounded-lg border border-white/12 bg-[#111]/86 p-4 shadow-2xl shadow-black/45 backdrop-blur sm:p-5">
               <p className="section-kicker">Phase 1 focus</p>
               <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                <div className="min-w-0 rounded-lg bg-white/[0.05] px-2 py-3">
-                  <b className="font-display block text-2xl leading-none text-[#c9a84c] sm:text-[1.7rem]">Artists</b>
-                  <span className="mt-2 block text-xs font-bold leading-4 text-[#f4f0e8]/52">audience</span>
+                <div className="flex min-h-[112px] min-w-0 flex-col items-center justify-center rounded-lg bg-white/[0.05] px-2 py-3">
+                  <b className="font-display block text-[1.45rem] leading-none text-[#c9a84c] sm:text-[1.55rem]">
+                    Artists
+                  </b>
+                  <span className="mt-3 block text-xs font-bold leading-4 text-[#f4f0e8]/58">
+                    find their audience
+                  </span>
                 </div>
-                <div className="min-w-0 rounded-lg bg-white/[0.05] px-2 py-3">
-                  <b className="font-display block text-2xl leading-none text-[#6fb6ff] sm:text-[1.7rem]">Scenes</b>
-                  <span className="mt-2 block text-xs font-bold leading-4 text-[#f4f0e8]/52">signal</span>
+                <div className="flex min-h-[112px] min-w-0 flex-col items-center justify-center rounded-lg bg-white/[0.05] px-2 py-3">
+                  <b className="font-display block text-[1.45rem] leading-none text-[#6fb6ff] sm:text-[1.55rem]">
+                    Fans
+                  </b>
+                  <span className="mt-3 block text-xs font-bold leading-4 text-[#f4f0e8]/58">
+                    shape what rises
+                  </span>
                 </div>
-                <div className="min-w-0 rounded-lg bg-white/[0.05] px-2 py-3">
-                  <b className="font-display block text-2xl leading-none text-[#ff7ac8] sm:text-[1.7rem]">Trust</b>
-                  <span className="mt-2 block text-xs font-bold leading-4 text-[#f4f0e8]/52">clarity</span>
+                <div className="flex min-h-[112px] min-w-0 flex-col items-center justify-center rounded-lg bg-white/[0.05] px-2 py-3">
+                  <b className="font-display block text-[1.45rem] leading-none text-[#ff7ac8] sm:text-[1.55rem]">
+                    Trust
+                  </b>
+                  <span className="mt-3 block text-xs font-bold leading-4 text-[#f4f0e8]/58">
+                    see every step
+                  </span>
                 </div>
               </div>
               <p className="mt-4 text-sm font-bold leading-6 text-[#f4f0e8]/62">
-                This first pass is about helping underground artists understand who is listening, what people connect
-                with, and what would make GroundFloor feel worth coming back to.
+                This first pass is about helping artists reach the right listeners, learning what fans actually connect
+                with, and building the transparency that makes GroundFloor trustworthy for everyone involved.
               </p>
             </aside>
           </div>
