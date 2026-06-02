@@ -271,17 +271,17 @@ export default function WaitlistPage() {
             <aside className="rounded-lg border border-white/12 bg-[#111]/86 p-4 shadow-2xl shadow-black/45 backdrop-blur sm:p-5">
               <p className="section-kicker">Phase 1 focus</p>
               <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                <div className="rounded-lg bg-white/[0.05] p-3">
-                  <b className="font-display block text-3xl text-[#c9a84c]">Artists</b>
-                  <span className="text-xs font-bold text-[#f4f0e8]/52">find their people</span>
+                <div className="min-w-0 rounded-lg bg-white/[0.05] px-2 py-3">
+                  <b className="font-display block text-2xl leading-none text-[#c9a84c] sm:text-[1.7rem]">Artists</b>
+                  <span className="mt-2 block text-xs font-bold leading-4 text-[#f4f0e8]/52">audience</span>
                 </div>
-                <div className="rounded-lg bg-white/[0.05] p-3">
-                  <b className="font-display block text-3xl text-[#6fb6ff]">Scenes</b>
-                  <span className="text-xs font-bold text-[#f4f0e8]/52">surface real taste</span>
+                <div className="min-w-0 rounded-lg bg-white/[0.05] px-2 py-3">
+                  <b className="font-display block text-2xl leading-none text-[#6fb6ff] sm:text-[1.7rem]">Scenes</b>
+                  <span className="mt-2 block text-xs font-bold leading-4 text-[#f4f0e8]/52">signal</span>
                 </div>
-                <div className="rounded-lg bg-white/[0.05] p-3">
-                  <b className="font-display block text-3xl text-[#ff7ac8]">Trust</b>
-                  <span className="text-xs font-bold text-[#f4f0e8]/52">shape the rules</span>
+                <div className="min-w-0 rounded-lg bg-white/[0.05] px-2 py-3">
+                  <b className="font-display block text-2xl leading-none text-[#ff7ac8] sm:text-[1.7rem]">Trust</b>
+                  <span className="mt-2 block text-xs font-bold leading-4 text-[#f4f0e8]/52">clarity</span>
                 </div>
               </div>
               <p className="mt-4 text-sm font-bold leading-6 text-[#f4f0e8]/62">
