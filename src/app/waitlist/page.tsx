@@ -185,7 +185,7 @@ function WaitlistForm({ onSuccess }: { onSuccess: () => void }) {
         <textarea
           className="field-input min-h-28 resize-y"
           name="whatTheyWant"
-          placeholder="Proof of ad spend, supporter badges, artist updates, discovery feed..."
+          placeholder="Artist updates, community voting, local scenes, behind-the-song stories..."
           required
         />
       </label>
@@ -195,7 +195,7 @@ function WaitlistForm({ onSuccess }: { onSuccess: () => void }) {
         <textarea
           className="field-input min-h-28 resize-y"
           name="whatToAvoid"
-          placeholder="Anything that would make this feel fake, spammy, unfair, or confusing"
+          placeholder="Anything that would make this feel fake, forced, noisy, unfair, or confusing"
           required
         />
       </label>
@@ -269,24 +269,24 @@ export default function WaitlistPage() {
             </div>
 
             <aside className="rounded-lg border border-white/12 bg-[#111]/86 p-4 shadow-2xl shadow-black/45 backdrop-blur sm:p-5">
-              <p className="section-kicker">Phase 1 signal</p>
+              <p className="section-kicker">Phase 1 focus</p>
               <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                 <div className="rounded-lg bg-white/[0.05] p-3">
-                  <b className="font-display block text-3xl text-[#c9a84c]">$5</b>
-                  <span className="text-xs font-bold text-[#f4f0e8]/52">starter signal</span>
+                  <b className="font-display block text-3xl text-[#c9a84c]">Artists</b>
+                  <span className="text-xs font-bold text-[#f4f0e8]/52">find their people</span>
                 </div>
                 <div className="rounded-lg bg-white/[0.05] p-3">
-                  <b className="font-display block text-3xl text-[#6fb6ff]">No</b>
-                  <span className="text-xs font-bold text-[#f4f0e8]/52">paywall yet</span>
+                  <b className="font-display block text-3xl text-[#6fb6ff]">Scenes</b>
+                  <span className="text-xs font-bold text-[#f4f0e8]/52">surface real taste</span>
                 </div>
                 <div className="rounded-lg bg-white/[0.05] p-3">
-                  <b className="font-display block text-3xl text-[#ff7ac8]">1st</b>
-                  <span className="text-xs font-bold text-[#f4f0e8]/52">early circle</span>
+                  <b className="font-display block text-3xl text-[#ff7ac8]">Trust</b>
+                  <span className="text-xs font-bold text-[#f4f0e8]/52">shape the rules</span>
                 </div>
               </div>
               <p className="mt-4 text-sm font-bold leading-6 text-[#f4f0e8]/62">
-                This first pass is about language, trust, and what the first users actually want. No payments are being
-                collected yet.
+                This first pass is about helping underground artists understand who is listening, what people connect
+                with, and what would make GroundFloor feel worth coming back to.
               </p>
             </aside>
           </div>
