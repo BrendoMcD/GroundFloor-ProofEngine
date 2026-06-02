@@ -44,11 +44,11 @@ export const submitWaitlistEntry = mutation({
       throw new Error("Please enter a valid email.");
     }
 
-    if (whatTheyWant.length < 8) {
+    if (whatTheyWant.length < 2) {
       throw new Error("Tell us a little more about what you want to see.");
     }
 
-    if (whatToAvoid.length < 8) {
+    if (whatToAvoid.length < 2) {
       throw new Error("Tell us a little more about what we should avoid.");
     }
 

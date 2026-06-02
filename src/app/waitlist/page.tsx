@@ -68,6 +68,26 @@ const campaignSteps = [
   "GroundFloor turns that early feedback into the first product decisions.",
 ];
 
+function getWaitlistErrorMessage(error: unknown) {
+  if (!(error instanceof Error)) {
+    return "Something went wrong. Please try again.";
+  }
+
+  if (error.message.includes("valid email")) {
+    return "Please enter a valid email.";
+  }
+
+  if (error.message.includes("what you want to see")) {
+    return "Tell us a little more about what you want to see.";
+  }
+
+  if (error.message.includes("what we should avoid")) {
+    return "Tell us a little more about what we should avoid.";
+  }
+
+  return "Something went wrong. Please try again.";
+}
+
 function WaitlistForm({ onSuccess }: { onSuccess: () => void }) {
   const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL ?? phaseOneConvexUrl;
   const convex = useMemo(() => (convexUrl ? new ConvexHttpClient(convexUrl) : null), [convexUrl]);
@@ -113,7 +133,7 @@ function WaitlistForm({ onSuccess }: { onSuccess: () => void }) {
       onSuccess();
     } catch (error) {
       setStatus("error");
-      setErrorMessage(error instanceof Error ? error.message : "Something went wrong. Please try again.");
+      setErrorMessage(getWaitlistErrorMessage(error));
     }
   }
 
