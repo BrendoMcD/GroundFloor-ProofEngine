@@ -28,6 +28,14 @@ export default defineSchema({
     source: v.string(),
     userAgent: v.optional(v.string()),
     createdAt: v.number(),
+    updatedAt: v.optional(v.number()),
+    brevoContactId: v.optional(v.number()),
+    brevoListId: v.optional(v.number()),
+    brevoSyncedAt: v.optional(v.number()),
+    brevoSyncStatus: v.optional(
+      v.union(v.literal("pending"), v.literal("synced"), v.literal("skipped"), v.literal("error")),
+    ),
+    brevoSyncError: v.optional(v.string()),
   }).index("by_email", ["email"]).index("by_createdAt", ["createdAt"]),
 
   // FANS & ARTISTS
