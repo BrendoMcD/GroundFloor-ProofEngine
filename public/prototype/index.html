@@ -1220,22 +1220,55 @@
     document.body.classList.toggle('mobile-cta-ready', shouldShow);
   };
 
-  const stepCards = document.querySelectorAll('.how-card');
-  if (prefersReducedMotion || !('IntersectionObserver' in window)) {
-    stepCards.forEach((card) => card.classList.add('is-visible-step'));
-  } else {
-    const stepObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        entry.target.classList.toggle('is-visible-step', entry.isIntersecting);
-      });
-    }, { threshold: 0.45 });
+  const stepCards = Array.from(document.querySelectorAll('.how-card'));
+  let stepTicking = false;
 
-    stepCards.forEach((card) => stepObserver.observe(card));
-  }
+  const updateStepCards = () => {
+    if (!stepCards.length) return;
+
+    if (prefersReducedMotion || window.matchMedia('(min-width: 901px)').matches) {
+      stepCards.forEach((card) => card.classList.remove('is-visible-step'));
+      return;
+    }
+
+    const activationLine = window.innerHeight * 0.58;
+    const activationBandTop = window.innerHeight * 0.25;
+    const activationBandBottom = window.innerHeight * 0.72;
+    let activeCard = null;
+    let activeDistance = Infinity;
+
+    stepCards.forEach((card) => {
+      const rect = card.getBoundingClientRect();
+      const cardCenter = rect.top + rect.height / 2;
+      const isInActivationBand = rect.top <= activationBandBottom && rect.bottom >= activationBandTop;
+      const distance = Math.abs(cardCenter - activationLine);
+
+      if (isInActivationBand && distance < activeDistance) {
+        activeCard = card;
+        activeDistance = distance;
+      }
+    });
+
+    stepCards.forEach((card) => {
+      card.classList.toggle('is-visible-step', card === activeCard);
+    });
+  };
+
+  const requestStepUpdate = () => {
+    if (stepTicking) return;
+    stepTicking = true;
+    window.requestAnimationFrame(() => {
+      updateStepCards();
+      stepTicking = false;
+    });
+  };
 
   updateStickyCta();
+  updateStepCards();
   window.addEventListener('scroll', updateStickyCta, { passive: true });
+  window.addEventListener('scroll', requestStepUpdate, { passive: true });
   window.addEventListener('resize', updateStickyCta);
+  window.addEventListener('resize', requestStepUpdate);
 </script>
 
 </body>
