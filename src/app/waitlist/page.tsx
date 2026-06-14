@@ -138,12 +138,12 @@ export default function WaitlistPage() {
             <Link className="font-display text-3xl uppercase text-[#c9a84c] sm:text-4xl" href="/">
               GROUNDFLOOR
             </Link>
-            <a
+            <Link
               className="rounded-full border border-white/12 bg-black/25 px-4 py-2 text-xs font-black uppercase tracking-[0.08em] text-white backdrop-blur transition hover:border-[#c9a84c]/70"
-              href="#join"
+              href="/"
             >
-              Waitlist
-            </a>
+              Home
+            </Link>
           </header>
 
           <div className="grid flex-1 items-end gap-12 pb-14 pt-20 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-center lg:pb-20 lg:pt-14">
